@@ -1,0 +1,294 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Silkscreen&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800&display=swap');
+@import url('https://cdn.jsdelivr.net/gh/IdreesInc/Monocraft-font/web/Monocraft.css');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    /* Prevent text size adjustment on mobile */
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+:root {
+    /* Base Colors */
+    --primary-green: #34C759;
+    --risk-red: #FF3B30;
+    --risk-bg-red: rgba(255, 59, 48, 0.2);
+    --safe-green: #34C759;
+    --safe-bg-green: rgba(52, 199, 89, 0.2);
+    --warn-orange: #FF9500;
+    --warn-yellow: #FFCC00;
+    --blue-accent: #32ADE6;
+
+    /* Dark Theme (Default) */
+    --bg-primary: #000000;
+    --bg-secondary: #000000;
+    --surface-bg: #141414;
+    --surface-hover: #1A1A1A;
+
+    --text-primary: #FFFFFF;
+    --text-secondary: #8E8E93;
+    --text-tertiary: #6E6E73;
+
+    --border-color: rgba(255, 255, 255, 0.1);
+
+    --shadow-card: none;
+    --shadow-nav: 0 -4px 20px rgba(0, 0, 0, 0.5);
+
+    --pill-bg: #141414;
+    /* Matched surface-bg for consistency */
+    --chart-bar: #34C759;
+    /* Using primary green */
+
+    /* Typography */
+    --font-family: 'Urbanist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-pixel: 'Monocraft', 'Silkscreen', cursive;
+}
+
+/* Light Theme */
+/* Light Theme */
+[data-theme="light"] {
+    --bg-primary: #F2F2F7;
+    /* Matches --bg-app */
+    --bg-secondary: #FFFFFF;
+    /* Matches --bg-frame */
+
+    --text-primary: #000000;
+    --text-secondary: #8E8E93;
+    /* Matches --text-muted */
+    --text-tertiary: #6E6E73;
+
+    --surface-bg: #FFFFFF;
+    /* Matches --bg-surface */
+    --surface-hover: #F5F5F5;
+    /* Matches --bg-surface-hover */
+
+    --border-color: #E5E5EA;
+
+    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-nav: 0 -4px 20px rgba(0, 0, 0, 0.05);
+
+    --pill-bg: #FFFFFF;
+    --chart-bar: #34C759;
+
+    /* Input BG from reference */
+    --input-bg: #F5F5F7;
+    --scan-line: rgba(52, 199, 89, 0.5);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+button {
+    font-family: var(--font-family);
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: inherit;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Page Transition Animations */
+@keyframes pageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pageFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Apply to all page containers */
+body>div {
+    animation: pageEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Typography Scale */
+.text-hero {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.text-large-number {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.text-heading {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.text-subheading {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.text-body {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.text-small {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--text-muted);
+}
+
+.text-tiny {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--text-muted);
+}
+
+/* Mobile-specific utilities */
+@media (max-width: 640px) {
+    .text-hero {
+        font-size: 36px;
+    }
+
+    .text-large-number {
+        font-size: 56px;
+    }
+
+    .text-heading {
+        font-size: 28px;
+    }
+}
+
+/* Navigation Link Styling */
+/* Navigation Link Styling */
+/* Navigation Link Styling */
+.bottom-nav-dock {
+    position: fixed;
+    /* User asked for absolute, but fixed ensures it stays on screen */
+    bottom: 32px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.nav-container {
+    background: rgba(20, 20, 20, 0.85);
+    /* Matches --surface-bg with alpha */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    /* User requested 14px */
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: auto;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .nav-container {
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    padding: 14px;
+    /* Square padding for icons */
+    border-radius: 12px;
+    color: var(--text-secondary);
+    /* Mapped from --text-muted */
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.nav-btn.active {
+    background-color: var(--text-primary);
+    color: var(--bg-primary);
+    /* Inverse text */
+    padding: 12px 20px;
+    /* Wider padding for text */
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.nav-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    font-family: 'Urbanist', sans-serif;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

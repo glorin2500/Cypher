@@ -1,0 +1,225 @@
+/* ===================================
+   NEW AUTH PAGE STYLES (MATCHING REFERENCE)
+   =================================== */
+
+.authPage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 460px;
+    justify-content: flex-start;
+    padding: 24px 0;
+    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Header */
+.authHeader {
+    margin-bottom: 32px;
+    margin-top: 20px;
+}
+
+.authTitle {
+    font-size: 36px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 12px;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    white-space: pre-line;
+}
+
+.authSubtitle {
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    display: block;
+}
+
+/* Toggle Buttons */
+.authToggle {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.toggleBtn {
+    flex: 1;
+    padding: 14px 24px;
+    border-radius: 16px;
+    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    color: #666;
+    font-family: var(--font-family);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggleActive {
+    background: #d4f469;
+    color: #000;
+    box-shadow: 0 4px 16px rgba(212, 244, 105, 0.3);
+}
+
+/* Input Fields */
+.authInputs {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.inputWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 16px 18px;
+    transition: all 0.3s ease;
+}
+
+.inputWrapper:focus-within {
+    border-color: rgba(212, 244, 105, 0.4);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.inputWrapper svg {
+    width: 20px;
+    height: 20px;
+    color: #666;
+    margin-right: 14px;
+    flex-shrink: 0;
+}
+
+.authInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-family: var(--font-family);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.authInput::placeholder {
+    color: #555;
+}
+
+.eyeIcon {
+    width: 20px;
+    height: 20px;
+    color: #666;
+    cursor: pointer;
+    margin-left: 12px;
+    flex-shrink: 0;
+}
+
+/* Submit Button */
+.authSubmitBtn {
+    width: 100%;
+    padding: 18px;
+    border-radius: 16px;
+    border: none;
+    background: #d4f469;
+    color: #000;
+    font-family: var(--font-family);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 24px rgba(212, 244, 105, 0.3);
+    margin-bottom: 24px;
+}
+
+.authSubmitBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(212, 244, 105, 0.4);
+}
+
+.authSubmitBtn:active {
+    transform: translateY(0);
+}
+
+/* Divider */
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+    color: #555;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.divider span {
+    padding: 0 16px;
+}
+
+/* Social Buttons */
+.socialButtons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.socialBtn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    color: #fff;
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.socialBtn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.socialBtn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Footer */
+.authFooter {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: auto;
+    padding-top: 20px;
+}
+
+.authFooter span {
+    color: #d4f469;
+    cursor: pointer;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.authFooter span:hover {
+    color: #b8d94a;
+}

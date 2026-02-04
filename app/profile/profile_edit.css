@@ -1,0 +1,65 @@
+/* ... existing styles ... */
+
+/* Drunken Grandma Edit Styles */
+.editWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.nameInput {
+    background: #2C2C2E;
+    border: 2px solid #d4f469;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    width: 100%;
+    outline: none;
+    font-family: 'Urbanist', sans-serif;
+}
+
+.nameInput:focus {
+    box-shadow: 0 0 0 4px rgba(212, 244, 105, 0.2);
+}
+
+.saveButton {
+    background: #d4f469;
+    color: #000;
+    font-weight: 800;
+    font-size: 16px;
+    padding: 16px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    width: 100%;
+    transition: transform 0.2s;
+}
+
+.saveButton:active {
+    transform: scale(0.96);
+}
+
+.editButton {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s;
+}
+
+.editButton:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #fff;
+}

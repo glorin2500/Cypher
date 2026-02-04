@@ -1,0 +1,206 @@
+/* ===================================
+   PROFILE PAGE UI - DARK THEME HARMONIZED
+   =================================== */
+
+.container {
+    min-height: 100vh;
+    background: var(--bg-primary);
+    font-family: var(--font-family);
+    padding: 0 0 120px 0;
+    /* Padding bottom for nav */
+    color: var(--text-primary);
+}
+
+/* ==========================
+   HEADER CARD
+   ========================== */
+.headerCard {
+    background: var(--surface-bg);
+    padding: 60px 24px 40px 24px;
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-card);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.headerTop {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.headerTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.headerIcon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-hover);
+    border-radius: 50%;
+    color: var(--text-primary);
+}
+
+.profileInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 12px;
+    border: 3px solid var(--surface-bg);
+    overflow: hidden;
+}
+
+.avatarImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.userName {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.userEmail {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* ==========================
+   LIST SECTIONS
+   ========================== */
+.sectionList {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sectionTitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-left: 12px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.menuItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.2s;
+    border-radius: 16px;
+}
+
+.menuItem:hover {
+    background: var(--surface-hover);
+}
+
+.menuLeft {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.menuIcon {
+    width: 24px;
+    height: 24px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menuLabel {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.menuRight {
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+}
+
+/* Toggle Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--surface-hover);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: var(--text-primary);
+}
+
+input:checked+.slider:before {
+    transform: translateX(20px);
+    background-color: #000;
+}

@@ -1,0 +1,170 @@
+/* ANALYTICS MODULE CSS - MATCHING REFERENCE */
+
+.container {
+    min-height: 100vh;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    padding-bottom: 120px;
+    transition: background-color 0.3s ease;
+}
+
+/* HEADER */
+.header {
+    padding: 56px 24px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.headerPill {
+    background: var(--surface-bg);
+    padding: 6px 16px;
+    border-radius: 99px;
+    box-shadow: var(--shadow-card);
+}
+
+.headerTitle {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+}
+
+/* MAIN CONTENT */
+.main {
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* GENERIC CARD (Matches Reference) */
+.card {
+    background-color: var(--surface-bg);
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: var(--shadow-card);
+    transition: background-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+/* TEXT UTILS */
+.textH1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.textH2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.textMuted {
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.actionLabel {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+    display: block;
+}
+
+/* CHART SECTION */
+.chartTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.chartContainer {
+    height: 120px;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.chartBar {
+    flex: 1;
+    background-color: var(--risk-red);
+    border-radius: 4px 4px 0 0;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.chartBar:hover {
+    opacity: 1;
+}
+
+.toggleContainer {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-primary);
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.toggleBtn {
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toggleActive {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+}
+
+/* RISK VECTORS */
+.riskItem {
+    margin-bottom: 12px;
+}
+
+.riskHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.riskLabel {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.progressContainer {
+    width: 100%;
+    height: 8px;
+    background-color: var(--bg-primary);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progressBar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}

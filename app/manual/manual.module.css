@@ -1,0 +1,105 @@
+/* Manual Entry Page Styles */
+.page {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-primary);
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.backBtn {
+    background: var(--surface-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.backBtn:hover {
+    background: var(--surface-hover);
+}
+
+.title {
+    flex: 1;
+    text-align: center;
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 700;
+    margin-right: 44px;
+}
+
+.manualForm {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 24px;
+}
+
+.inputLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.manualInput {
+    width: 100%;
+    padding: 16px;
+    background: var(--surface-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 16px;
+    font-family: monospace;
+    transition: all 0.2s;
+}
+
+.manualInput:focus {
+    outline: none;
+    border-color: var(--text-primary);
+}
+
+.manualInput::placeholder {
+    color: var(--text-muted);
+}
+
+.divider {
+    flex: 1;
+}
+
+.verifyBtn {
+    width: 100%;
+    padding: 16px;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.verifyBtn:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.verifyBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

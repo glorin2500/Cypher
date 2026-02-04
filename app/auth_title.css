@@ -1,0 +1,22 @@
+/* ... existing styles ... */
+
+.appName {
+    font-size: 42px;
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+    line-height: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    letter-spacing: -1px;
+}
+
+.appTagline {
+    font-size: 14px;
+    font-weight: 600;
+    color: #d4f469;
+    letter-spacing: 4px;
+    margin-top: 4px;
+    text-transform: uppercase;
+}
