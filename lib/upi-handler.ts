@@ -51,11 +51,24 @@ export function parseUPIString(qrData: string): UPIParams | null {
  * Build UPI deep-link URL from parameters
  */
 export function buildUPIDeepLink(params: UPIParams): string {
+    // Validate VPA format
+    if (!params.pa || !params.pa.includes('@')) {
+        throw new Error('Invalid UPI ID format - must contain @');
+    }
+
+    // Validate amount if present
+    if (params.am) {
+        const amount = parseFloat(params.am);
+        if (isNaN(amount) || amount <= 0) {
+            throw new Error('Invalid amount - must be a positive number');
+        }
+    }
+
     const queryParams = new URLSearchParams();
     queryParams.set('pa', params.pa);
     if (params.pn) queryParams.set('pn', params.pn);
     if (params.am) queryParams.set('am', params.am);
-    if (params.cu) queryParams.set('cu', params.cu);
+    queryParams.set('cu', params.cu || 'INR');  // Always include currency (default: INR)
     if (params.tn) queryParams.set('tn', params.tn);
     if (params.tr) queryParams.set('tr', params.tr);
 

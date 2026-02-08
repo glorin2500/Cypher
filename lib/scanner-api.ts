@@ -24,6 +24,8 @@ export interface AnalysisResult {
     details?: {
         merchant?: string;
         upi_id?: string;
+        amount?: string;
+        original_upi_string?: string;  // ✅ Full UPI string for payment
         categories?: string[];
     };
     flags?: string[]; // For backward compatibility if needed
@@ -63,12 +65,14 @@ export async function analyzeQRString(text: string): Promise<AnalysisResult> {
     // 3. Analyze
     const result = await analyzeQRPayload(features);
 
-    // 4. Enrich with details
+    // 4. Enrich with details (PRESERVE ORIGINAL UPI STRING)
     return {
         ...result,
         details: {
             merchant: upiData.pn || 'Unknown Merchant',
             upi_id: upiData.pa,
+            amount: upiData.am,
+            original_upi_string: text,  // ✅ PRESERVE FULL UPI STRING
             categories: []
         },
         is_safe: result.risk_label === 'safe'

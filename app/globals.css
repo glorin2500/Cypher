@@ -50,6 +50,8 @@ html {
 
     /* Typography */
     --font-family: 'Urbanist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-pixel: 'Monocraft', 'Courier New', monospace;
+    /* Minecraft-style font */
     --font-pixel: 'Monocraft', 'Silkscreen', cursive;
 }
 

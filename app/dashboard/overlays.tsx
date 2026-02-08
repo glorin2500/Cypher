@@ -280,12 +280,57 @@ export const ResultModal = ({ result, onClose }: { result: AnalysisResult, onClo
     const isDanger = result.risk_label === 'danger';
 
     const handleProceed = () => {
-        if (result.details?.upi_id) {
-            // Deep Link to UPI App
-            const upiLink = `upi://pay?pa=${result.details.upi_id}&pn=${result.details.merchant || ''}`;
-            window.location.href = upiLink;
-        }
-        onClose();
+        // Wrap async logic to prevent unhandled promise rejection
+        (async () => {
+            try {
+                // Import UPI handler functions
+                const { parseUPIString, attemptUPIRedirect, copyToClipboard } = await import('@/lib/upi-handler');
+
+                if (result.details?.original_upi_string) {
+                    // Parse and rebuild to ensure proper formatting
+                    console.log('🔍 Original UPI String:', result.details.original_upi_string);
+                    const upiParams = parseUPIString(result.details.original_upi_string);
+
+                    if (upiParams) {
+                        console.log('✅ Parsed UPI Params:', upiParams);
+                        const success = attemptUPIRedirect(upiParams);
+
+                        if (!success) {
+                            // Fallback: Copy UPI ID to clipboard
+                            await copyToClipboard(result.details.upi_id || '');
+                            alert('UPI ID copied to clipboard! Please open your UPI app manually.');
+                        }
+                    } else {
+                        throw new Error('Failed to parse UPI string');
+                    }
+                } else if (result.details?.upi_id) {
+                    // Construct from available details
+                    console.log('🔍 Constructing UPI from details:', result.details);
+                    const success = attemptUPIRedirect({
+                        pa: result.details.upi_id,
+                        pn: result.details.merchant,
+                        am: result.details.amount,
+                        cu: 'INR'  // Add currency for Indian payments
+                    });
+
+                    if (!success) {
+                        await copyToClipboard(result.details.upi_id);
+                        alert('UPI ID copied to clipboard! Please open your UPI app manually.');
+                    }
+                } else {
+                    throw new Error('No UPI data available for payment');
+                }
+            } catch (error) {
+                console.error('❌ Payment redirect failed:', error);
+                alert(`Unable to open UPI app: ${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease try again or use manual payment.`);
+            } finally {
+                onClose();
+            }
+        })().catch((err) => {
+            // Catch any unhandled errors from the async IIFE
+            console.error('❌ Unhandled error in handleProceed:', err);
+            onClose();
+        });
     };
 
     // Calculate threat percentage (0-100)

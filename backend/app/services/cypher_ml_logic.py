@@ -1,6 +1,7 @@
 def analyze_transaction(features: dict) -> dict:
     """
     Cypher – Enhanced Explainable UPI Threat Detection Logic
+    NOW WITH ML-POWERED PHISHING DETECTION!
     
     MANDATORY CONTRACT (Backward Compatible):
     Input (REQUIRED):
@@ -27,6 +28,18 @@ def analyze_transaction(features: dict) -> dict:
     }
     """
     
+    # --- ML Model Integration ---
+    try:
+        import sys
+        import os
+        # Add parent directory to path to import ml module
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        from ml.predictor import predict_phishing_probability
+        ml_available = True
+    except Exception as e:
+        print(f"⚠️  ML model not available: {e}")
+        ml_available = False
+    
     # --- Extract Required Features (with safe defaults) ---
     amount_risk = features.get("amount_risk", 0.0)
     payee_risk = features.get("payee_risk", 0.0)
@@ -38,6 +51,22 @@ def analyze_transaction(features: dict) -> dict:
     amount_value = features.get("amount_value", None)
     hour_of_day = features.get("hour_of_day", None)
     payee_id = features.get("payee_id", None)
+    
+    # --- ML-Enhanced Payee Risk ---
+    if ml_available and payee_id:
+        try:
+            ml_phishing_prob = predict_phishing_probability(payee_id)
+            # Blend rule-based (40%) with ML (60%)
+            original_payee_risk = payee_risk
+            payee_risk = (payee_risk * 0.4) + (ml_phishing_prob * 0.6)
+            
+            print(f"🤖 ML Enhancement: {payee_id}")
+            print(f"   Rule-based risk: {original_payee_risk:.2f}")
+            print(f"   ML phishing prob: {ml_phishing_prob:.2f}")
+            print(f"   Final payee_risk: {payee_risk:.2f}")
+        except Exception as e:
+            print(f"⚠️  ML prediction failed: {e}")
+    
     
     # --- Base Weights (UPI-specific reasoning) ---
     WEIGHTS = {

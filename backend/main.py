@@ -8,6 +8,7 @@ from app.user_settings import (
     update_notifications, 
     update_preferences
 )
+from app.routers import ml
 
 app = FastAPI(title="Cypher Threat Engine")
 
@@ -19,6 +20,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Register ML router
+app.include_router(ml.router, prefix="/api", tags=["ml"])
 
 # In-memory history (Persistent for session)
 scan_history = []
