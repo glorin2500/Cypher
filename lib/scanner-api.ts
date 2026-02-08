@@ -34,7 +34,9 @@ export interface AnalysisResult {
 
 export async function fetchScanHistory(): Promise<AnalysisResult[]> {
     try {
-        const response = await fetch('http://localhost:8000/history');
+        // Use environment variable or fallback to production backend
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://cypher-backend-production.up.railway.app';
+        const response = await fetch(`${API_BASE_URL}/history`);
         if (!response.ok) throw new Error('Failed to fetch history');
         return await response.json();
     } catch (error) {
@@ -91,9 +93,12 @@ export async function analyzeQRPayload(
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-        const response = await fetch('http://localhost:8000/analyze', {
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://cypher-backend-production.up.railway.app';
+        const response = await fetch(`${API_BASE_URL}/analyze`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify(features),
             signal: controller.signal,
         });
