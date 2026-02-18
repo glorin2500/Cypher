@@ -1,65 +1,174 @@
-# 🚀 Cypher - Handover Context (Project State)
-
-**Current Date**: 2026-02-04
-**Project**: CYPHER (UPI Security Checkpoint)
-**Location**: `c:\Users\Glorin\.gemini\antigravity\scratch\CYPHERR`
+# Cypher - UPI Threat Detection System
+**Last Updated: Feb 18, 2026**
 
 ---
 
-## 🛑 Current Objective
-Build a "Security Checkpoint" app that sits *before* a UPI payment app. It scans a QR/VPA, analyzes it for fraud, and gives a **SAFE/DANGEROUS** verdict. Requires a pixel-perfect, premium UI.
-
-## 🛠️ Tech Stack
-*   **Frontend**: Next.js 15 (App Router), React, CSS Modules.
-*   **Backend**: Python (FastAPI).
-*   **State Management**: `ScanContext` (React Context) for history and risk scores.
-*   **Design System**: **Strict Monochrome (Black & White)**. High contrast, clean, premium.
-*   **Icons**: Lucide React + Custom SVG mappings.
+## 🚀 Live Deployments
+- **Frontend (Vercel)**: https://cypher-self.vercel.app
+- **Backend (Railway)**: https://cypher-backend-production.up.railway.app
+- **GitHub Repo**: https://github.com/glorin2500/Cypher
 
 ---
 
-## ✅ Recent Accomplishments
-
-### 1. Theme Overhaul (Monochrome)
-*   **Reverted from Green/Gold**: The entire app (`app/page.tsx`, `auth.module.css`, `dashboard`) has been updated to a strict Black & White aesthetic.
-*   **Fixes**: Removed all placeholder "green" comments and variables from auth styles.
-
-### 2. Dashboard (`app/dashboard/page.tsx`)
-*   **Layout**: Implemented reference `TransactionItem` structure for "Recent Scans".
-*   **Features**:
-    *   **Balance Card**: Displays Safety Score (98%).
-    *   **Action Grid**: Scan, Upload, Manual buttons triggering overlays.
-    *   **Recent Scans**: Lists transactions with correct icons (Shield/Alert) and "Risk Detected" states.
-*   **Overlays**: Implemented `ScannerView`, `UploadView`, and `ManualView` as overlays instead of separate routes for a smoother UX.
-
-### 3. Analytics (`app/analytics/page.tsx`)
-*   **UI Overhaul**: Completely rewrote the page to match the user's reference code.
-*   **Features**:
-    *   **Threats Blocked**: Bar chart with Week/Month toggles.
-    *   **Risk Vectors**: Progress bars showing specific threats (Spoofed VPAs, Malicious QRs).
-    *   **Integration**: Connected to `ScanContext` for live data.
-
-### 4. Scanner & Integration
-*   **Integration**: `html5-qrcode` fully wired up.
-*   **Flow**: Scan -> Processing Animation -> Result Modal -> Proceed to Payment (Deep Link) or Cancel.
-*   **State**: `ScanContext` creates a single source of truth for Scan History and Safety Scores, persisting across pages.
+## 🛠 Tech Stack
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 15 (App Router), CSS Modules |
+| Backend | FastAPI (Python), Uvicorn |
+| ML | scikit-learn Random Forest, joblib, numpy |
+| Hosting | Vercel (frontend), Railway (backend) |
+| Scanning | html5-qrcode |
 
 ---
 
-## 📋 Immediate Next Steps (To-Do)
+## 📂 Project Structure
 
-1.  **Backend Connection**:
-    *   Ensure the `scanner-api` calls the actual Python backend (`http://localhost:8000/analyze`) for real analysis (currently using mock logic for UI dev).
-2.  **Profile Page**:
-    *   Polish the Profile UI if needed to match the new Monochrome standard.
-3.  **Persist Data**:
-    *   Currently using `localStorage` in `ScanContext`. Consider robust database if scale increases.
+```
+CYPHERR/
+├── app/
+│   ├── dashboard/          # Main hub, risk graph, recent scans
+│   ├── scanner/            # Live camera QR scanning
+│   ├── upload/             # Image upload QR analysis
+│   ├── manual/             # Manual UPI ID entry
+│   ├── analytics/          # Threat analysis charts
+│   ├── profile/            # User settings
+│   ├── context/            # ScanContext, ThemeContext
+│   ├── components/         # BottomNav, shared components
+│   └── globals.css         # Global styles, Monocraft font
+├── lib/
+│   ├── scanner-api.ts      # Backend API calls (uses Railway URL)
+│   └── upi-handler.ts      # UPI deep link builder + validation
+├── backend/
+│   ├── main.py             # FastAPI app entry point
+│   ├── requirements.txt    # Python deps (fastapi, sklearn, etc.)
+│   ├── app/
+│   │   ├── routers/ml.py   # ML API endpoints
+│   │   └── services/cypher_ml_logic.py  # Hybrid risk scoring
+│   └── ml/
+│       ├── dataset_generator.py  # Synthetic UPI dataset (10k+)
+│       ├── feature_extractor.py  # 11 numerical features
+│       ├── train_model.py        # Model training script
+│       ├── predictor.py          # Inference wrapper
+│       ├── models/               # Saved .pkl model files
+│       └── README.md
+├── vercel.json             # Vercel deployment config
+├── DEPLOYMENT.md           # Full deployment guide
+└── starter_message.md      # This file
+```
 
 ---
 
-## 💡 Important Context for Next Session
-*   **Theme Rule**: **NO COLORED ACCENTS** (except for functional status like Red for Risk, Green for Safe). The core UI must be Black/White/Gray.
-*   **Visual Fidelity**: We are strictly following reference implementations for list items and charts. Do not deviate from the `TransactionItem` structure in the dashboard.
-*   **Icons**: Use the custom SVG dictionary in `dashboard/page.tsx` for specific list icons (Shield, Alert) to ensure they render as graphics, not text.
+## ✨ All Features Implemented
 
-**Start Command**: `npm run dev` (Frontend) + `python main.py` (Dashboard Backend).
+### Scanning & Detection
+- Live camera QR scanner with spotlight overlay effect
+- Gallery/image upload QR decoding
+- Manual UPI ID entry with validation
+- Auto-redirect to upload on non-HTTPS (mobile fallback)
+
+### Risk Analysis Engine
+- **Hybrid scoring**: ML (60%) + Rule-based (40%)
+- **ML Model**: Random Forest trained on 10,000+ synthetic UPI IDs
+- **11 features**: length, entropy, digit ratio, domain reputation, brand distance, phishing keywords, etc.
+- **Risk labels**: `safe` (green) / `warning` (orange) / `danger` (red)
+- **API endpoints**:
+  - `POST /analyze` — main risk analysis
+  - `POST /api/ml/predict_payee_risk` — direct ML prediction
+  - `GET /api/ml/health` — model health check
+
+### Dashboard
+- Safety Score with **Minecraft/Monocraft font** (pixelated)
+- Pulsing green/red animation based on score
+- Live Risk Monitor graph (SVG, smooth curves)
+- Recent Scans list with risk labels and timestamps
+- Scan / Upload / Manual action buttons
+
+### UPI Payment Flow
+- Preserves full original UPI string from QR scan
+- Builds deep link: `upi://pay?pa=...&pn=...&am=...&cu=INR`
+- Always includes `cu=INR` (was missing — caused payment failures)
+- VPA format validation (must contain `@`)
+- Amount validation (must be positive number)
+- Clipboard fallback if UPI app launch fails
+- Proper async error handling (fixed `[object Event]` runtime error)
+
+### UI/UX
+- Premium dark/monochrome theme
+- Glassmorphism cards, smooth transitions
+- Bottom navigation (hidden on scanner/upload/manual pages)
+- Light/dark theme toggle
+- Mobile-first responsive design
+
+---
+
+## 🐛 Bugs Fixed in This Session
+
+| Bug | Fix |
+|---|---|
+| `ModuleNotFoundError: No module named 'feature_extractor'` | Changed to `from ml.feature_extractor import` |
+| UPI payment opens but fails | Added `cu=INR`, proper URL encoding, original UPI string preservation |
+| `[object Event]` runtime error | Wrapped async handler in IIFE with `.catch()` |
+| Duplicate `--font-pixel` CSS variable | Cleaned up globals.css |
+| ML router import path wrong | Fixed `sys.path` resolution using `os.path.abspath` |
+
+---
+
+## 🔑 Key Files & What They Do
+
+| File | Purpose |
+|---|---|
+| `lib/scanner-api.ts` | All backend API calls; uses `NEXT_PUBLIC_API_URL` env var or Railway URL |
+| `lib/upi-handler.ts` | Parses, validates, and builds UPI deep links |
+| `app/dashboard/overlays.tsx` | Result modal with `handleProceed` for UPI payment |
+| `app/dashboard/page.tsx` | Dashboard with safety score (Monocraft font) |
+| `app/globals.css` | `--font-pixel: 'Monocraft'`, `--font-family: 'Urbanist'` |
+| `backend/app/services/cypher_ml_logic.py` | Blends ML + rule scores |
+| `backend/app/routers/ml.py` | FastAPI ML endpoints |
+| `backend/ml/predictor.py` | Loads model, runs inference |
+
+---
+
+## ⚙️ Environment Variables
+
+### Frontend (Vercel)
+```
+NEXT_PUBLIC_API_URL=https://cypher-backend-production.up.railway.app
+```
+*(If not set, falls back to the Railway URL hardcoded in scanner-api.ts)*
+
+### Backend (Railway)
+- No special env vars required; runs on `PORT` provided by Railway.
+
+---
+
+## 🚢 Deployment Commands
+
+### Frontend
+```bash
+vercel --prod
+# Already linked to: glorins-projects-0b8619fe/cypher
+```
+
+### Backend
+```bash
+cd backend
+railway up
+# Project: cypher-backend (glorin2500's Projects)
+```
+
+### Push to GitHub
+```bash
+git add .
+git commit -m "your message"
+git push origin main
+```
+*(Vercel auto-redeploys on push to main)*
+
+---
+
+## 🔮 Suggested Next Steps
+1. Set `NEXT_PUBLIC_API_URL` as a Vercel environment variable (cleaner than hardcoded)
+2. Add real UPI QR code testing on mobile
+3. Monitor Railway backend cold starts (free tier sleeps after inactivity)
+4. Consider adding user auth if storing scan history server-side
+5. Explore Capacitor to wrap the app as a native Android/iOS app
