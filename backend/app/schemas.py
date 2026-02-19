@@ -8,7 +8,11 @@ class TransactionInput(BaseModel):
     frequency_risk: float
     timing_risk: float
     device_risk: float
-    # Optional metadata if needed for logs, but not model features
+    # Enhanced context — used by ML model for accurate UPI-specific analysis
+    payee_id: Optional[str] = None       # Actual UPI ID (e.g. "merchant@paytm")
+    amount_value: Optional[float] = None # Actual amount in ₹
+    hour_of_day: Optional[int] = None    # 0-23, used for timing context
+    # Optional metadata
     metadata: Optional[dict] = None
 
 class AnalysisResult(BaseModel):

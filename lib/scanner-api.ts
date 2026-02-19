@@ -99,7 +99,18 @@ export async function analyzeQRPayload(
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(features),
+            // Send ALL fields including optional context so backend ML can analyze the real UPI ID
+            body: JSON.stringify({
+                amount_risk: features.amount_risk,
+                payee_risk: features.payee_risk,
+                frequency_risk: features.frequency_risk,
+                timing_risk: features.timing_risk,
+                device_risk: features.device_risk,
+                // Optional enriched context — wires the real UPI ID to the ML model
+                ...(features.payee_id !== undefined && { payee_id: features.payee_id }),
+                ...(features.amount_value !== undefined && { amount_value: features.amount_value }),
+                ...(features.hour_of_day !== undefined && { hour_of_day: features.hour_of_day }),
+            }),
             signal: controller.signal,
         });
 
