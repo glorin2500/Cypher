@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import styles from "./dashboard.module.css";
 import { analyzeQRPayload, analyzeQRString, type AnalysisResult } from "@/lib/scanner-api";
@@ -273,162 +273,270 @@ export const ManualView = ({ onClose, onDetect }: { onClose: () => void, onDetec
     );
 };
 
+// --- PAYMENT INFO MODAL (Desktop fallback) ---
+const PaymentModal = ({ upiId, merchant, amount, onClose }: {
+    upiId: string;
+    merchant?: string;
+    amount?: string;
+    onClose: () => void;
+}) => {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(upiId);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            // fallback
+            const ta = document.createElement('textarea');
+            ta.value = upiId;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    return (
+        <div style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: 'rgba(0,0,0,0.75)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '24px'
+        }} onClick={onClose}>
+            <div style={{
+                background: 'var(--surface-bg)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '16px',
+                padding: '28px 24px',
+                width: '100%',
+                maxWidth: '360px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px'
+            }} onClick={e => e.stopPropagation()}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: 700, margin: 0 }}>Pay via UPI App</h3>
+                    <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '22px', cursor: 'pointer', lineHeight: 1 }}>×</button>
+                </div>
+
+                <p style={{ color: 'var(--text-secondary)', fontSize: '13px', margin: 0, lineHeight: 1.6 }}>
+                    UPI deep links only open on <strong style={{ color: 'var(--text-primary)' }}>mobile devices</strong> with a UPI app installed.
+                    Copy the details below and open PhonePe / GPay / Paytm manually.
+                </p>
+
+                <div style={{ background: 'var(--background)', borderRadius: '10px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {merchant && merchant !== 'Unknown Merchant' && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>To</span>
+                            <span style={{ color: 'var(--text-primary)', fontSize: '13px', fontWeight: 600 }}>{merchant}</span>
+                        </div>
+                    )}
+                    {amount && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>Amount</span>
+                            <span style={{ color: 'var(--text-primary)', fontSize: '13px', fontWeight: 600 }}>₹{amount}</span>
+                        </div>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <span style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>UPI ID</span>
+                        <span style={{ color: 'var(--text-primary)', fontSize: '13px', fontFamily: 'monospace', wordBreak: 'break-all' }}>{upiId}</span>
+                    </div>
+                </div>
+
+                <button
+                    onClick={handleCopy}
+                    style={{
+                        background: copied ? '#22c55e' : 'var(--text-primary)',
+                        color: copied ? 'white' : 'var(--background)',
+                        border: 'none',
+                        borderRadius: '10px',
+                        padding: '14px',
+                        fontSize: '15px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                    }}
+                >
+                    {copied ? '✓ Copied!' : 'Copy UPI ID'}
+                </button>
+            </div>
+        </div>
+    );
+};
+
 // --- ANALYSIS MODAL (Monochrome) ---
 export const ResultModal = ({ result, onClose }: { result: AnalysisResult, onClose: () => void }) => {
     const isSafe = result.risk_label === 'safe';
     const isWarning = result.risk_label === 'warning';
     const isDanger = result.risk_label === 'danger';
+    const [paymentModal, setPaymentModal] = useState<{ upiId: string; merchant?: string; amount?: string } | null>(null);
 
-    const handleProceed = () => {
-        // Wrap async logic to prevent unhandled promise rejection
+    // Detect if running on a mobile device
+    const isMobile = () => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    const handleProceed = useCallback(() => {
         (async () => {
             try {
-                // Import UPI handler functions
-                const { parseUPIString, attemptUPIRedirect, copyToClipboard } = await import('@/lib/upi-handler');
+                const { parseUPIString, buildUPIDeepLink } = await import('@/lib/upi-handler');
+
+                let upiId = '';
+                let merchant: string | undefined;
+                let amount: string | undefined;
+                let deepLink = '';
 
                 if (result.details?.original_upi_string) {
-                    // Parse and rebuild to ensure proper formatting
-                    console.log('🔍 Original UPI String:', result.details.original_upi_string);
                     const upiParams = parseUPIString(result.details.original_upi_string);
-
-                    if (upiParams) {
-                        console.log('✅ Parsed UPI Params:', upiParams);
-                        const success = attemptUPIRedirect(upiParams);
-
-                        if (!success) {
-                            // Fallback: Copy UPI ID to clipboard
-                            await copyToClipboard(result.details.upi_id || '');
-                            alert('UPI ID copied to clipboard! Please open your UPI app manually.');
-                        }
-                    } else {
-                        throw new Error('Failed to parse UPI string');
-                    }
+                    if (!upiParams) throw new Error('Failed to parse UPI string');
+                    upiId = upiParams.pa;
+                    merchant = upiParams.pn;
+                    amount = upiParams.am;
+                    deepLink = buildUPIDeepLink(upiParams);
                 } else if (result.details?.upi_id) {
-                    // Construct from available details
-                    console.log('🔍 Constructing UPI from details:', result.details);
-                    const success = attemptUPIRedirect({
-                        pa: result.details.upi_id,
-                        pn: result.details.merchant,
-                        am: result.details.amount,
-                        cu: 'INR'  // Add currency for Indian payments
-                    });
-
-                    if (!success) {
-                        await copyToClipboard(result.details.upi_id);
-                        alert('UPI ID copied to clipboard! Please open your UPI app manually.');
-                    }
+                    upiId = result.details.upi_id;
+                    merchant = result.details.merchant;
+                    amount = result.details.amount;
+                    deepLink = buildUPIDeepLink({ pa: upiId, pn: merchant, am: amount, cu: 'INR' });
                 } else {
                     throw new Error('No UPI data available for payment');
                 }
+
+                if (isMobile()) {
+                    // On mobile: fire the deep link — UPI apps will intercept it
+                    window.location.href = deepLink;
+                    // Small delay — if we're still here after 1.5s, app didn't open
+                    await new Promise(r => setTimeout(r, 1500));
+                    // If code reaches here, deep link was ignored — show fallback
+                    setPaymentModal({ upiId, merchant, amount });
+                } else {
+                    // On desktop: upi:// links don't work — show payment info modal
+                    setPaymentModal({ upiId, merchant, amount });
+                }
             } catch (error) {
-                console.error('❌ Payment redirect failed:', error);
-                alert(`Unable to open UPI app: ${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease try again or use manual payment.`);
-            } finally {
-                onClose();
+                console.error('❌ Payment failed:', error);
+                // If we have a UPI ID, show the modal as last resort
+                if (result.details?.upi_id) {
+                    setPaymentModal({
+                        upiId: result.details.upi_id,
+                        merchant: result.details.merchant,
+                        amount: result.details.amount
+                    });
+                }
             }
-        })().catch((err) => {
-            // Catch any unhandled errors from the async IIFE
-            console.error('❌ Unhandled error in handleProceed:', err);
-            onClose();
-        });
-    };
+        })().catch(console.error);
+    }, [result]);
 
     // Calculate threat percentage (0-100)
     const threatPercentage = result.risk_score || 0;
 
     return (
-        <div className={styles.modalOverlay} onClick={onClose}>
-            <div className={styles.analysisModal} onClick={e => e.stopPropagation()}>
-                {/* Header with Status */}
-                <div className={styles.analysisHeader}>
-                    <div className={styles.analysisStatus}>
-                        <div className={`${styles.statusDot} ${isDanger ? styles.riskDot : styles.safeDot}`}
-                            style={{ width: '12px', height: '12px', marginRight: '12px' }} />
-                        <h2 className={styles.analysisTitle}>
-                            {isDanger ? 'Risk Detected' : isWarning ? 'Warning' : 'Verified Safe'}
-                        </h2>
+        <>
+            {paymentModal && (
+                <PaymentModal
+                    upiId={paymentModal.upiId}
+                    merchant={paymentModal.merchant}
+                    amount={paymentModal.amount}
+                    onClose={() => { setPaymentModal(null); onClose(); }}
+                />
+            )}
+            <div className={styles.modalOverlay} onClick={onClose}>
+                <div className={styles.analysisModal} onClick={e => e.stopPropagation()}>
+                    {/* Header with Status */}
+                    <div className={styles.analysisHeader}>
+                        <div className={styles.analysisStatus}>
+                            <div className={`${styles.statusDot} ${isDanger ? styles.riskDot : styles.safeDot}`}
+                                style={{ width: '12px', height: '12px', marginRight: '12px' }} />
+                            <h2 className={styles.analysisTitle}>
+                                {isDanger ? 'Risk Detected' : isWarning ? 'Warning' : 'Verified Safe'}
+                            </h2>
+                        </div>
+                        <button onClick={onClose} className={styles.analysisClose}>×</button>
                     </div>
-                    <button onClick={onClose} className={styles.analysisClose}>×</button>
-                </div>
 
-                {/* Merchant Info */}
-                <div className={styles.analysisSection}>
-                    <div className={styles.analysisRow}>
-                        <span className={styles.analysisLabel}>Merchant</span>
-                        <span className={styles.analysisValue}>{result.details?.merchant || 'Unknown'}</span>
-                    </div>
-                    <div className={styles.analysisRow}>
-                        <span className={styles.analysisLabel}>UPI ID</span>
-                        <span className={styles.analysisValue} style={{ fontSize: '13px', fontFamily: 'monospace' }}>
-                            {result.details?.upi_id || 'N/A'}
-                        </span>
-                    </div>
-                </div>
-
-                {/* Threat Level */}
-                <div className={styles.analysisSection}>
-                    <div className={styles.analysisRow}>
-                        <span className={styles.analysisLabel}>Threat Level</span>
-                        <span className={styles.analysisValue}>{threatPercentage}%</span>
-                    </div>
-                    <div className={styles.threatBar}>
-                        <div
-                            className={styles.threatBarFill}
-                            style={{
-                                width: `${threatPercentage}%`,
-                                background: isDanger ? '#FF3B30' : isWarning ? '#FF9500' : 'var(--border-color)'
-                            }}
-                        />
-                    </div>
-                </div>
-
-                {/* Risk Factors */}
-                {result.reasons && result.reasons.length > 0 && (
+                    {/* Merchant Info */}
                     <div className={styles.analysisSection}>
-                        <span className={styles.analysisLabel} style={{ marginBottom: '12px', display: 'block' }}>
-                            {isDanger || isWarning ? 'Risk Factors' : 'Analysis'}
-                        </span>
-                        <div className={styles.riskFactorsList}>
-                            {result.reasons.map((reason, idx) => (
-                                <div key={idx} className={styles.riskFactorItem}>
-                                    <span className={styles.riskFactorBullet}>•</span>
-                                    <span className={styles.riskFactorText}>{reason}</span>
-                                </div>
-                            ))}
+                        <div className={styles.analysisRow}>
+                            <span className={styles.analysisLabel}>Merchant</span>
+                            <span className={styles.analysisValue}>{result.details?.merchant || 'Unknown'}</span>
+                        </div>
+                        <div className={styles.analysisRow}>
+                            <span className={styles.analysisLabel}>UPI ID</span>
+                            <span className={styles.analysisValue} style={{ fontSize: '13px', fontFamily: 'monospace' }}>
+                                {result.details?.upi_id || 'N/A'}
+                            </span>
                         </div>
                     </div>
-                )}
 
-                {/* Action Buttons */}
-                <div className={styles.analysisActions}>
-                    {isDanger ? (
-                        <>
-                            <button
-                                onClick={handleProceed}
-                                className={styles.analysisProceedDanger}
-                            >
-                                Proceed Anyway (Not Recommended)
-                            </button>
-                            <button onClick={onClose} className={styles.analysisCancel}>
-                                Block Transaction
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <button
-                                onClick={handleProceed}
-                                className={styles.analysisProceed}
-                            >
-                                Proceed to Payment
-                            </button>
-                            <button onClick={onClose} className={styles.analysisCancel}>
-                                Cancel
-                            </button>
-                        </>
+                    {/* Threat Level */}
+                    <div className={styles.analysisSection}>
+                        <div className={styles.analysisRow}>
+                            <span className={styles.analysisLabel}>Threat Level</span>
+                            <span className={styles.analysisValue}>{threatPercentage}%</span>
+                        </div>
+                        <div className={styles.threatBar}>
+                            <div
+                                className={styles.threatBarFill}
+                                style={{
+                                    width: `${threatPercentage}%`,
+                                    background: isDanger ? '#FF3B30' : isWarning ? '#FF9500' : 'var(--border-color)'
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Risk Factors */}
+                    {result.reasons && result.reasons.length > 0 && (
+                        <div className={styles.analysisSection}>
+                            <span className={styles.analysisLabel} style={{ marginBottom: '12px', display: 'block' }}>
+                                {isDanger || isWarning ? 'Risk Factors' : 'Analysis'}
+                            </span>
+                            <div className={styles.riskFactorsList}>
+                                {result.reasons.map((reason, idx) => (
+                                    <div key={idx} className={styles.riskFactorItem}>
+                                        <span className={styles.riskFactorBullet}>•</span>
+                                        <span className={styles.riskFactorText}>{reason}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     )}
+
+                    {/* Action Buttons */}
+                    <div className={styles.analysisActions}>
+                        {isDanger ? (
+                            <>
+                                <button
+                                    onClick={handleProceed}
+                                    className={styles.analysisProceedDanger}
+                                >
+                                    Proceed Anyway (Not Recommended)
+                                </button>
+                                <button onClick={onClose} className={styles.analysisCancel}>
+                                    Block Transaction
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button
+                                    onClick={handleProceed}
+                                    className={styles.analysisProceed}
+                                >
+                                    Proceed to Payment
+                                </button>
+                                <button onClick={onClose} className={styles.analysisCancel}>
+                                    Cancel
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
