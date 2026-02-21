@@ -4,7 +4,7 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import styles from "./dashboard.module.css";
 import { analyzeQRPayload, analyzeQRString, type AnalysisResult } from "@/lib/scanner-api";
-import { hapticSuccess, hapticError } from "@/lib/haptics";
+import { hapticSuccess, hapticWarning, hapticError } from "@/lib/haptics";
 import { useScan } from "@/app/context/ScanContext";
 
 // --- ICONS ---
@@ -59,6 +59,7 @@ export const ScannerView = ({ onClose, onDetect }: { onClose: () => void, onDete
                                 await new Promise(r => setTimeout(r, 1500));
 
                                 if (result.risk_label === 'safe') hapticSuccess();
+                                else if (result.risk_label === 'warning') hapticWarning();
                                 else hapticError();
 
                                 addScan(result); // Update Global State
@@ -174,6 +175,7 @@ export const UploadView = ({ onClose, onDetect }: { onClose: () => void, onDetec
 
                 // Trigger haptic feedback
                 if (result.risk_label === 'safe') hapticSuccess();
+                else if (result.risk_label === 'warning') hapticWarning();
                 else hapticError();
 
                 setProcessing(false);
@@ -241,6 +243,7 @@ export const ManualView = ({ onClose, onDetect }: { onClose: () => void, onDetec
             onDetect(result);
 
             if (result.risk_label === 'safe') hapticSuccess();
+            else if (result.risk_label === 'warning') hapticWarning();
             else hapticError();
         } catch (e) {
             console.error(e);

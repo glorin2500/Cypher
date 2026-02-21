@@ -13,7 +13,7 @@ export function triggerHaptic(style: HapticStyle = 'light'): void {
     if (typeof window === 'undefined') return;
 
     // Vibration API (widely supported on mobile)
-    if ('vibrate' in navigator) {
+    if ('vibrate' in navigator && typeof navigator.vibrate === 'function') {
         const patterns: Record<HapticStyle, number | number[]> = {
             light: 10,
             medium: 20,

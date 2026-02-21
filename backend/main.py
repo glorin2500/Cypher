@@ -1,41 +1,51 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from app.schemas import TransactionInput, AnalysisResult
 from app.services.inference import analyze_transaction
 from app.user_settings import (
-    load_settings, 
-    update_user_info, 
-    update_notifications, 
+    load_settings,
+    update_user_info,
+    update_notifications,
     update_preferences
 )
 from app.routers import ml
 
+# Rate limiter keyed by client IP
+limiter = Limiter(key_func=get_remote_address)
+
 app = FastAPI(title="Cypher Threat Engine")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Allow frontend to call us
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For local demo, allow all
+    allow_origins=[
+        "https://cypher-self.vercel.app",
+        "http://localhost:3000",            # local dev
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["POST", "GET"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 # Register ML router
 app.include_router(ml.router, prefix="/api", tags=["ml"])
 
-# In-memory history (Persistent for session)
+# In-memory history (session-scoped)
 scan_history = []
 
 # ===== USER SETTINGS ENDPOINTS =====
 @app.get("/api/user/settings")
 def get_user_settings():
-    """Get all user settings"""
     return load_settings()
 
 @app.post("/api/user/info")
 def update_user(data: dict):
-    """Update user information"""
     name = data.get("name")
     email = data.get("email")
     settings = update_user_info(name=name, email=email)
@@ -43,7 +53,6 @@ def update_user(data: dict):
 
 @app.post("/api/user/notifications")
 def update_notification_settings(data: dict):
-    """Update notification settings"""
     settings = update_notifications(
         push_enabled=data.get("push_enabled"),
         email_alerts=data.get("email_alerts"),
@@ -53,7 +62,6 @@ def update_notification_settings(data: dict):
 
 @app.post("/api/user/preferences")
 def update_user_preferences(data: dict):
-    """Update user preferences"""
     settings = update_preferences(
         dark_mode=data.get("dark_mode"),
         haptic_feedback=data.get("haptic_feedback"),
@@ -61,9 +69,10 @@ def update_user_preferences(data: dict):
     )
     return {"success": True, "settings": settings}
 
-# ===== ANALYSIS ENDPOINT =====
+# ===== ANALYSIS ENDPOINT — 30 requests/minute per IP =====
 @app.post("/analyze", response_model=AnalysisResult)
-async def analyze(data: TransactionInput):
+@limiter.limit("30/minute")
+async def analyze(request: Request, data: TransactionInput):
     try:
         result = analyze_transaction(data)
         scan_history.append(result)
@@ -72,7 +81,8 @@ async def analyze(data: TransactionInput):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/history", response_model=list[AnalysisResult])
-def get_history():
+@limiter.limit("60/minute")
+async def get_history(request: Request):
     return scan_history
 
 @app.get("/health")
