@@ -1,388 +1,319 @@
 /* ===================================
-   CYPHER — LANDING PAGE (REDESIGN)
-   Inspired by floating-orbs aesthetic
+   CYPHER — AUTH / LANDING PAGE
+   Matches dashboard.module.css design system exactly:
+   font: Urbanist (--font-family)
+   bg: #000 (--bg-primary)
+   surface: #141414 (--surface-bg)
+   border: rgba(255,255,255,0.1) (--border-color)
+   btn: white bg + black text (--text-primary / --bg-primary)
    =================================== */
 
-/* ── Root layouts ─────────────────── */
-.introRoot {
-    position: relative;
-    height: 100vh;
-    height: 100dvh;
-    background: #0a0a0a;
-    overflow: hidden;
+/* ── Base page shell ── */
+.page {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--bg-primary);
+    font-family: var(--font-family);
+    color: var(--text-primary);
     display: flex;
     flex-direction: column;
-}
-
-.authRoot {
-    height: 100vh;
-    height: 100dvh;
-    background: #0a0a0a;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
+    padding: 0 16px;
     box-sizing: border-box;
+    transition: background-color 0.3s ease;
 }
 
-/* ── Orb Field ─────────────────────── */
-.orbField {
-    position: absolute;
-    inset: 0;
-    /* orbs only occupy ~50% top */
-    height: 52%;
-    pointer-events: none;
-    z-index: 0;
-}
-
-.orb {
-    position: absolute;
-    border-radius: 50%;
-    /* Convert vw to a capped size — handled inline */
-    animation: orbFloat 6s ease-in-out infinite alternate;
-    will-change: transform;
-}
-
-@keyframes orbFloat {
-    0%   { transform: translateY(0px) scale(1); }
-    50%  { transform: translateY(-8px) scale(1.03); }
-    100% { transform: translateY(4px) scale(0.97); }
-}
-
-/* Gradient fade at the bottom of the orb area */
-.orbFade {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60%;
-    background: linear-gradient(to bottom, transparent 0%, #0a0a0a 90%);
-}
-
-/* ── Intro content (lower half) ──── */
-.introContent {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 0 28px 40px;
+/* ── Header — matches dashboard .header ── */
+.header {
     display: flex;
-    flex-direction: column;
-    gap: 0;
-    z-index: 1;
-    animation: slideUpIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    align-items: center;
+    padding: 56px 8px 16px;
 }
 
-@keyframes slideUpIn {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
+/* Logo pill — exact copy of dashboard .logoPill */
+.logoPill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface-bg);
+    padding: 8px 16px 8px 12px;
+    border-radius: 99px;
+    border: 1px solid var(--border-color);
 }
 
-.exitDown {
-    animation: slideDownOut 0.3s ease-in forwards;
+.logoText {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-primary);
 }
 
-@keyframes slideDownOut {
-    to { opacity: 0; transform: translateY(16px); }
-}
-
-/* Brand badge */
-.brandBadge {
+/* Back button */
+.backBtn {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    color: rgba(255,255,255,0.45);
-    text-transform: uppercase;
-    margin-bottom: 24px;
+    font-family: var(--font-family);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 0;
+    transition: color 0.2s;
 }
 
-.brandDot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #d4f469;
-    display: inline-block;
-    box-shadow: 0 0 8px #d4f469;
+.backBtn:hover {
+    color: var(--text-primary);
 }
 
-/* Flashcard text block */
-.flashBlock {
+/* ── Main flashcard area ── */
+.main {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 28px;
-    animation: fadeSlideCard 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+    justify-content: flex-end;
+    padding-bottom: 32px;
 }
 
-@keyframes fadeSlideCard {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
+/* Card — matches dashboard .listCard surface */
+.card {
+    background: var(--surface-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    animation: fadeSlide 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.flashEyebrow {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 2px;
+@keyframes fadeSlide {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Label — matches dashboard .listTitle / .balanceLabel style */
+.cardLabel {
+    font-size: 10px;
+    font-weight: 700;
     text-transform: uppercase;
-    color: #d4f469;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+    opacity: 0.6;
 }
 
-.flashTitle {
-    font-size: 36px;
+/* Title — big, like dashboard balance hero text */
+.cardTitle {
+    font-size: 38px;
     font-weight: 800;
-    color: #ffffff;
+    color: var(--text-primary);
     line-height: 1.08;
     letter-spacing: -0.8px;
     margin: 0;
 }
 
-.flashSub {
-    font-size: 14px;
-    font-weight: 400;
-    color: rgba(255,255,255,0.5);
+/* Body */
+.cardBody {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-secondary);
     line-height: 1.55;
     margin: 4px 0 0;
-    max-width: 85%;
 }
 
-/* Dots */
+/* ── Dots ── */
 .dots {
     display: flex;
     gap: 7px;
-    margin-bottom: 28px;
+    margin-bottom: 4px;
 }
 
 .dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.2);
+    background: var(--border-color);
     border: none;
     padding: 0;
     cursor: pointer;
-    transition: all 0.35s ease;
+    transition: all 0.3s ease;
 }
 
 .dotActive {
     width: 22px;
     border-radius: 100px;
-    background: #d4f469;
+    background: var(--text-primary);
 }
 
-/* CTA Button — Cypher Green */
-.ctaBtn {
+/* ── Footer CTA ── */
+.footer {
+    padding: 0 0 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Primary button — exact match of dashboard .analysisProceed */
+.btnPrimary {
     width: 100%;
-    padding: 19px;
-    border-radius: 100px;
+    padding: 18px;
+    background: var(--text-primary);
+    color: var(--bg-primary);
     border: none;
-    background: #d4f469;
-    color: #0a0a0a;
-    font-size: 17px;
+    border-radius: 12px;
+    font-family: var(--font-family);
+    font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    letter-spacing: 0.2px;
-    transition: transform 0.18s, box-shadow 0.18s;
-    box-shadow: 0 0 0 0 rgba(212, 244, 105, 0);
-    font-family: var(--font-family);
+    letter-spacing: 0.3px;
+    transition: all 0.2s;
 }
 
-.ctaBtn:hover {
-    box-shadow: 0 6px 30px rgba(212, 244, 105, 0.35);
+.btnPrimary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
 }
 
-.ctaBtn:active {
-    transform: scale(0.97);
+.btnPrimary:active {
+    transform: translateY(0);
+    opacity: 0.9;
 }
 
-/* Login hint */
-.loginHint {
+/* Hint text */
+.footerHint {
     text-align: center;
     font-size: 13px;
-    color: rgba(255,255,255,0.35);
-    margin-top: 18px;
     font-weight: 500;
+    color: var(--text-secondary);
 }
 
-.loginHint span {
-    color: #d4f469;
+.footerHint span {
+    color: var(--text-primary);
     cursor: pointer;
     font-weight: 700;
 }
 
-
 /* ===================================
-   AUTH PAGE (Sign In / Sign Up)
+   AUTH PAGE
    =================================== */
 
 .authPage {
-    width: 100%;
-    max-width: 440px;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    animation: slideUpIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    max-height: 100dvh;
+    padding-bottom: 32px;
+    max-height: calc(100dvh - 120px);
     overflow-y: auto;
-    padding-bottom: 16px;
 }
 
-.backButton {
-    background: none;
-    border: none;
-    color: rgba(255,255,255,0.45);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    padding: 10px 0;
-    margin-bottom: 20px;
-    align-self: flex-start;
-    font-family: var(--font-family);
-}
-
-.backButton svg {
-    width: 18px;
-    height: 18px;
-}
-
-/* Auth Header */
 .authHeader {
     margin-bottom: 28px;
 }
 
-.authTitle {
-    font-size: 36px;
-    font-weight: 800;
-    color: #ffffff;
+/* Eyebrow — matches .balanceLabel */
+.authEyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+    opacity: 0.6;
     margin: 0 0 8px;
-    line-height: 1.08;
-    letter-spacing: -0.8px;
 }
 
-.authTitle span {
-    color: #d4f469;
+/* Auth title — matches .text-heading */
+.authTitle {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    margin: 0;
 }
 
-.authSubtitle {
-    color: rgba(255,255,255,0.4);
-    font-size: 14px;
-    font-weight: 500;
-    display: block;
-}
-
-/* Toggle */
-.authToggle {
+/* Toggle — matches dashboard pill style */
+.toggle {
     display: flex;
-    gap: 10px;
-    margin-bottom: 24px;
-    background: #161616;
-    border-radius: 16px;
-    padding: 5px;
+    background: var(--surface-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+    margin-bottom: 20px;
 }
 
 .toggleBtn {
     flex: 1;
-    padding: 13px;
-    border-radius: 12px;
+    padding: 12px;
+    border-radius: 10px;
     border: none;
     background: transparent;
-    color: rgba(255,255,255,0.45);
+    color: var(--text-secondary);
     font-family: var(--font-family);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.25s ease;
 }
 
 .toggleActive {
-    background: #ffffff;
-    color: #0a0a0a;
+    background: var(--text-primary);
+    color: var(--bg-primary);
 }
 
-/* Inputs */
-.authInputs {
+/* Inputs — matches dashboard .searchInput */
+.inputs {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 10px;
+    margin-bottom: 16px;
 }
 
-.inputWrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    background: #161616;
-    border: 1px solid #232323;
-    border-radius: 16px;
-    padding: 16px 18px;
-    transition: border-color 0.25s;
-}
-
-.inputWrapper:focus-within {
-    border-color: #d4f469;
-}
-
-.inputWrapper svg {
-    width: 20px;
-    height: 20px;
-    color: rgba(255,255,255,0.35);
-    margin-right: 14px;
-    flex-shrink: 0;
-}
-
-.authInput {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #ffffff;
-    font-family: var(--font-family);
-    font-size: 16px;
-    font-weight: 500;
-}
-
-.authInput::placeholder {
-    color: rgba(255,255,255,0.25);
-}
-
-/* Submit */
-.authSubmitBtn {
+.input {
     width: 100%;
-    padding: 19px;
-    border-radius: 100px;
-    border: none;
-    background: #d4f469;
-    color: #0a0a0a;
-    font-family: var(--font-family);
+    padding: 16px 18px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
     font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: transform 0.18s, box-shadow 0.18s;
-    margin-bottom: 20px;
+    /* 16px prevents iOS zoom */
+    font-family: var(--font-family);
+    font-weight: 500;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
 }
 
-.authSubmitBtn:hover {
-    box-shadow: 0 6px 24px rgba(212, 244, 105, 0.3);
+.input:focus {
+    border-color: var(--text-primary);
 }
 
-.authSubmitBtn:active {
-    transform: scale(0.97);
+.input::placeholder {
+    color: var(--text-tertiary);
 }
 
 /* Divider */
 .divider {
     display: flex;
     align-items: center;
-    margin: 4px 0 18px;
-    color: rgba(255,255,255,0.2);
-    font-size: 12px;
-    font-weight: 500;
+    margin: 16px 0;
     gap: 12px;
+    color: var(--text-tertiary);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .divider::before,
@@ -390,13 +321,13 @@
     content: '';
     flex: 1;
     height: 1px;
-    background: #232323;
+    background: var(--border-color);
 }
 
-/* Social */
-.socialButtons {
+/* Social buttons — matches dashboard .actionButton style */
+.social {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 20px;
 }
 
@@ -407,51 +338,59 @@
     justify-content: center;
     gap: 8px;
     padding: 14px;
-    border-radius: 16px;
-    border: 1px solid #232323;
-    background: #161616;
-    color: #ffffff;
+    background: var(--surface-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
     font-family: var(--font-family);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color 0.2s, transform 0.1s;
 }
 
 .socialBtn:active {
-    background: #1e1e1e;
+    transform: scale(0.97);
+    background: var(--surface-hover);
 }
 
-/* Footer */
-.authFooter {
+/* Switch hint */
+.switchHint {
     text-align: center;
     font-size: 13px;
+    font-weight: 500;
     margin-top: auto;
     padding-top: 8px;
 }
 
-.footerMuted {
-    color: rgba(255,255,255,0.35);
+.muted {
+    color: var(--text-secondary);
 }
 
-.authFooter span:last-child {
-    color: #d4f469;
+.link {
+    color: var(--text-primary);
     cursor: pointer;
     font-weight: 700;
 }
 
-/* ── Responsive ─────────────────── */
+/* ── Responsive ── */
 @media (max-height: 700px) {
-    .flashTitle { font-size: 28px; }
-    .introContent { padding-bottom: 28px; }
-    .ctaBtn { padding: 16px; }
+    .header {
+        padding-top: 32px;
+    }
+
+    .cardTitle {
+        font-size: 30px;
+    }
+
+    .footer {
+        padding-bottom: 28px;
+    }
 }
 
 @media (min-width: 600px) {
-    .introContent {
+    .page {
         max-width: 480px;
         margin: 0 auto;
-        padding-left: 40px;
-        padding-right: 40px;
     }
 }
