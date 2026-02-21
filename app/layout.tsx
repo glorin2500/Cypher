@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ScanProvider } from "./context/ScanContext";
 import { BottomNav } from "./components/BottomNav";
+import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
     title: "Cypher - UPI Threat Detection",
@@ -29,15 +30,17 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" suppressHydrationWarning>
-            <body>
-                <ThemeProvider>
-                    <ScanProvider>
-                        {children}
-                        <BottomNav />
-                    </ScanProvider>
-                </ThemeProvider>
-            </body>
-        </html>
+        <ClerkProvider>
+            <html lang="en" suppressHydrationWarning>
+                <body>
+                    <ThemeProvider>
+                        <ScanProvider>
+                            {children}
+                            <BottomNav />
+                        </ScanProvider>
+                    </ThemeProvider>
+                </body>
+            </html>
+        </ClerkProvider>
     );
 }

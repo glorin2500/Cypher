@@ -1,11 +1,17 @@
-from fastapi import FastAPI, HTTPException, Request
+import json
+import os
+from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from sqlalchemy.orm import Session
+
 from app.schemas import TransactionInput, AnalysisResult
 from app.services.inference import analyze_transaction
+from app.database import engine, get_db
+from app import models
 from app.user_settings import (
     load_settings,
     update_user_info,
@@ -14,6 +20,9 @@ from app.user_settings import (
 )
 from app.routers import ml
 
+# Create DB tables on startup (no-op if already exist)
+models.Base.metadata.create_all(bind=engine)
+
 # Rate limiter keyed by client IP
 limiter = Limiter(key_func=get_remote_address)
 
@@ -21,12 +30,12 @@ app = FastAPI(title="Cypher Threat Engine")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Allow frontend to call us
+# CORS — only allow our frontend domains
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://cypher-self.vercel.app",
-        "http://localhost:3000",            # local dev
+        "http://localhost:3000",
     ],
     allow_credentials=True,
     allow_methods=["POST", "GET"],
@@ -36,9 +45,6 @@ app.add_middleware(
 # Register ML router
 app.include_router(ml.router, prefix="/api", tags=["ml"])
 
-# In-memory history (session-scoped)
-scan_history = []
-
 # ===== USER SETTINGS ENDPOINTS =====
 @app.get("/api/user/settings")
 def get_user_settings():
@@ -46,9 +52,7 @@ def get_user_settings():
 
 @app.post("/api/user/info")
 def update_user(data: dict):
-    name = data.get("name")
-    email = data.get("email")
-    settings = update_user_info(name=name, email=email)
+    settings = update_user_info(name=data.get("name"), email=data.get("email"))
     return {"success": True, "settings": settings}
 
 @app.post("/api/user/notifications")
@@ -69,21 +73,52 @@ def update_user_preferences(data: dict):
     )
     return {"success": True, "settings": settings}
 
-# ===== ANALYSIS ENDPOINT — 30 requests/minute per IP =====
+# ===== ANALYSIS ENDPOINT — 30/min per IP =====
 @app.post("/analyze", response_model=AnalysisResult)
 @limiter.limit("30/minute")
-async def analyze(request: Request, data: TransactionInput):
+async def analyze(request: Request, data: TransactionInput, db: Session = Depends(get_db)):
     try:
         result = analyze_transaction(data)
-        scan_history.append(result)
+
+        # Persist to database
+        record = models.ScanRecord(
+            upi_id=data.payee_id,
+            risk_score=result.risk_score,
+            risk_label=result.risk_label,
+            reasons=json.dumps(result.reasons),
+            user_id=request.headers.get("X-User-Id"),  # Clerk user ID from frontend header
+        )
+        db.add(record)
+        db.commit()
+
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# ===== HISTORY — from PostgreSQL =====
 @app.get("/history", response_model=list[AnalysisResult])
 @limiter.limit("60/minute")
-async def get_history(request: Request):
-    return scan_history
+async def get_history(request: Request, db: Session = Depends(get_db)):
+    user_id = request.headers.get("X-User-Id")
+    # If user ID provided, return their history; otherwise return last 50 records
+    if user_id:
+        records = db.query(models.ScanRecord).filter(
+            models.ScanRecord.user_id == user_id
+        ).order_by(models.ScanRecord.timestamp.desc()).limit(50).all()
+    else:
+        records = db.query(models.ScanRecord).order_by(
+            models.ScanRecord.timestamp.desc()
+        ).limit(50).all()
+
+    return [
+        AnalysisResult(
+            risk_score=r.risk_score,
+            risk_label=r.risk_label,
+            reasons=json.loads(r.reasons) if r.reasons else [],
+            timestamp=r.timestamp,
+        )
+        for r in records
+    ]
 
 @app.get("/health")
 def health_check():
