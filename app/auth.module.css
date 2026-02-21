@@ -1,52 +1,122 @@
 /* ===================================
    CYPHER — AUTH / LANDING PAGE
-   Matches dashboard.module.css design system exactly:
-   font: Urbanist (--font-family)
-   bg: #000 (--bg-primary)
-   surface: #141414 (--surface-bg)
-   border: rgba(255,255,255,0.1) (--border-color)
-   btn: white bg + black text (--text-primary / --bg-primary)
+   Dashboard design tokens throughout:
+   font: --font-family (Urbanist)
+   bg: --bg-primary (#000)
+   surface: --surface-bg (#141414)
+   border: --border-color (rgba white 10%)
+   btn: --text-primary on --bg-primary
    =================================== */
 
 /* ── Base page shell ── */
 .page {
+    position: relative;
     min-height: 100vh;
     min-height: 100dvh;
     background: var(--bg-primary);
     font-family: var(--font-family);
     color: var(--text-primary);
-    display: flex;
-    flex-direction: column;
-    padding: 0 16px;
-    box-sizing: border-box;
+    overflow: hidden;
     transition: background-color 0.3s ease;
 }
 
-/* ── Header — matches dashboard .header ── */
-.header {
-    display: flex;
-    align-items: center;
-    padding: 56px 8px 16px;
+/* ── Logo SVG sizing ── */
+.logo {
+    width: 52px;
+    height: 52px;
 }
 
-/* Logo pill — exact copy of dashboard .logoPill */
-.logoPill {
+/* ── Orb field (top 56% of screen) ── */
+.orbField {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 58%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    animation: orbFloat 6s ease-in-out infinite alternate;
+    will-change: transform;
+}
+
+@keyframes orbFloat {
+    0% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-9px) scale(1.04);
+    }
+
+    100% {
+        transform: translateY(5px) scale(0.96);
+    }
+}
+
+/* Logo centered inside orb field */
+.orbLogo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 10px;
-    background: var(--surface-bg);
-    padding: 8px 16px 8px 12px;
-    border-radius: 99px;
-    border: 1px solid var(--border-color);
+    z-index: 2;
 }
 
-.logoText {
+.orbLogoText {
     font-size: 11px;
     font-weight: 800;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--text-primary);
+    opacity: 0.6;
 }
+
+/* Gradient fade at the bottom of orb area */
+.orbFade {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 55%;
+    background: linear-gradient(to bottom, transparent 0%, var(--bg-primary) 100%);
+}
+
+/* ── Intro content sits at the bottom ── */
+.introContent {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 20px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    z-index: 1;
+    animation: slideUpIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes slideUpIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
 
 /* Back button */
 .backBtn {
@@ -68,14 +138,7 @@
     color: var(--text-primary);
 }
 
-/* ── Main flashcard area ── */
-.main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding-bottom: 32px;
-}
+
 
 /* Card — matches dashboard .listCard surface */
 .card {
@@ -155,13 +218,7 @@
     background: var(--text-primary);
 }
 
-/* ── Footer CTA ── */
-.footer {
-    padding: 0 0 40px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
+
 
 /* Primary button — exact match of dashboard .analysisProceed */
 .btnPrimary {
