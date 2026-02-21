@@ -5,9 +5,7 @@ import { useState, useEffect } from "react";
 import styles from "./auth.module.css";
 import { setUserName } from "@/lib/user-store";
 
-// ─────────────────────────────────────────────────────────────
-// Animated Cypher Logo — hex draws on, gem pops in, glow pulses
-// ─────────────────────────────────────────────────────────────
+// ── Animated Logo ─────────────────────────────────────────────
 const CypherLogo = () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
         strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
@@ -23,19 +21,19 @@ const CypherLogo = () => (
             }
             @keyframes glowPulse {
                 0%,100% { filter: drop-shadow(0 0 4px rgba(255,255,255,0.35)); }
-                50%     { filter: drop-shadow(0 0 14px rgba(255,255,255,0.8)); }
+                50%     { filter: drop-shadow(0 0 16px rgba(255,255,255,0.9)); }
             }
             .hexPath {
-                stroke: var(--text-primary);
+                stroke: #ffffff;
                 stroke-dasharray: 60;
                 stroke-dashoffset: 60;
                 animation: drawHex 1.5s cubic-bezier(0.22,1,0.36,1) forwards 0.3s;
             }
             .gemPath {
                 transform-origin: 12px 12px;
-                fill: var(--text-primary);
+                fill: #ffffff;
                 animation:
-                    revealGem 0.9s cubic-bezier(0.34,1.56,0.64,1) forwards 0.95s,
+                    revealGem 0.9s cubic-bezier(0.34,1.56,0.64,1) forwards 1s,
                     glowPulse 3s ease-in-out infinite 2.2s;
                 opacity: 0;
             }
@@ -45,18 +43,34 @@ const CypherLogo = () => (
     </svg>
 );
 
-// ─────────────────────────────────────────────────────────────
-// Bubble grid — 4 rows × 5 circles
-// Even rows offset right by half a bubble to create stagger
-// Colors: only dashboard palette (surface + white)
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
+//  BUBBLE GRID — matches reference image layout exactly
+//
+//  Reference has ~3 circles per row, meaning each circle ≈ 33vw wide.
+//  Alternating rows are offset by half a circle (16.5vw) to create stagger.
+//  Colors mapped to Cypher theme:
+//    Yellow-green  →  #34C759  (--primary-green)
+//    Dark gray     →  #141414  (--surface-bg)
+//    Darker gray   →  #1a1a1a  (--surface-hover)
+//    White         →  #ffffff  (--text-primary)
+//    Light gray    →  #b0b0b0  (neutral accent, like the blue-gray in ref)
+// ─────────────────────────────────────────────────────────────────────────
+//
+//  Row layout (R = odd/base, O = even/offset):
+//
+//  R1: [dark,  dark,  GREEN, GREEN, dark ] ← 3.5 visible
+//  O2: [GREEN, dark,  WHITE, dark,  GREEN] ← 3.5 visible (shifted 16.5vw)
+//  R3: [gray,  dark,  GREEN, dark,  gray ] ← 3.5 visible
+//  O4: [dark,  GREEN, dark,  dark,  dark ] ← partial (fades out)
+//
 const ROWS: string[][] = [
-    ["#1a1a1a", "#141414", "#1e1e1e", "#141414", "#1a1a1a"],
-    ["#141414", "#0f0f0f", "#ffffff", "#1a1a1a", "#141414"],
-    ["#e8e8e8", "#141414", "#1a1a1a", "#0f0f0f", "#1e1e1e"],
-    ["#141414", "#1a1a1a", "#141414", "#1e1e1e", "#141414"],
+    ["#141414", "#1a1a1a", "#34C759", "#34C759", "#141414"],
+    ["#34C759", "#141414", "#ffffff", "#141414", "#34C759"],
+    ["#b0b0b0", "#141414", "#34C759", "#141414", "#b0b0b0"],
+    ["#141414", "#34C759", "#141414", "#1a1a1a", "#141414"],
 ];
 
+// ─────────────────────────────────────────────────────────────
 const flashcards = [
     {
         label: "AI Engine",
@@ -109,27 +123,30 @@ export default function AuthPage() {
     if (authMode === "intro") return (
         <div className={styles.page}>
 
-            {/* BUBBLE FIELD */}
+            {/* ====== BUBBLE FIELD ====== */}
             <div className={styles.bubbleField}>
                 {ROWS.map((row, ri) => (
-                    <div key={ri} className={`${styles.bubbleRow} ${ri % 2 === 1 ? styles.bubbleRowOffset : ""}`}>
+                    <div
+                        key={ri}
+                        className={`${styles.bubbleRow} ${ri % 2 === 0 ? styles.bubbleRowBase : styles.bubbleRowOffset}`}
+                    >
                         {row.map((color, ci) => (
                             <div key={ci} className={styles.bubble} style={{ background: color }} />
                         ))}
                     </div>
                 ))}
 
-                {/* LOGO centered over bubbles */}
+                {/* Animated logo, centered over bubbles */}
                 <div className={styles.logoOverlay}>
                     <CypherLogo />
                     <span className={styles.logoLabel}>CYPHER</span>
                 </div>
 
-                {/* fade to bg color at bottom */}
+                {/* Gradient fades field into black */}
                 <div className={styles.bubbleFade} />
             </div>
 
-            {/* FLASHCARD + CTA */}
+            {/* ====== FLASHCARD + CTA ====== */}
             <div className={styles.bottom}>
                 <div className={styles.card} key={card}>
                     <span className={styles.cardLabel}>{f.label}</span>
@@ -164,7 +181,6 @@ export default function AuthPage() {
     return (
         <div className={styles.page}>
             <div className={styles.authInner}>
-
                 <button className={styles.backBtn} onClick={() => setAuthMode("intro")}>
                     <ArrowLeft /> Back
                 </button>
