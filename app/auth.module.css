@@ -142,6 +142,22 @@
     display: flex;
     flex-direction: column;
     padding: 4px 20px 36px;
+    /* transition for splash → intro slide-up */
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.55s ease;
+}
+
+/* Splash phase: pushed below screen */
+.bottomHidden {
+    transform: translateY(110%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Intro phase: slides up into place */
+.bottomVisible {
+    transform: translateY(0);
+    opacity: 1;
 }
 
 /* Card — matches dashboard .listCard */

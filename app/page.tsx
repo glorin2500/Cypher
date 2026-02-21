@@ -91,19 +91,28 @@ const ArrowLeft = () => (
 );
 
 type AuthMode = "intro" | "auth";
+type Phase = "splash" | "intro";  // splash = logo only, intro = logo + flashcards
 
 export default function AuthPage() {
     const router = useRouter();
+    const [phase, setPhase] = useState<Phase>("splash");  // start on logo-only splash
     const [card, setCard] = useState(0);
     const [authMode, setAuthMode] = useState<AuthMode>("intro");
     const [authTab, setAuthTab] = useState<"signin" | "signup">("signup");
     const [name, setName] = useState("");
 
+    // Auto-advance: splash screen shows for 3.5s then flashcards slide up
     useEffect(() => {
-        if (authMode !== "intro") return;
+        const t = setTimeout(() => setPhase("intro"), 3500);
+        return () => clearTimeout(t);
+    }, []);
+
+    // Flashcard auto-rotate — only starts once intro phase is active
+    useEffect(() => {
+        if (phase !== "intro" || authMode !== "intro") return;
         const id = setInterval(() => setCard(p => (p + 1) % flashcards.length), 4000);
         return () => clearInterval(id);
-    }, [authMode]);
+    }, [phase, authMode]);
 
     const handleContinue = () => {
         if (name.trim()) setUserName(name);
@@ -143,8 +152,8 @@ export default function AuthPage() {
                 <div className={styles.bubbleFade} />
             </div>
 
-            {/* ====== FLASHCARD + CTA ====== */}
-            <div className={styles.bottom}>
+            {/* ====== FLASHCARD + CTA — hidden during splash, slides up after 3.5s ====== */}
+            <div className={`${styles.bottom} ${phase === "splash" ? styles.bottomHidden : styles.bottomVisible}`}>
                 <div className={styles.card} key={card}>
                     <span className={styles.cardLabel}>{f.label}</span>
                     <h1 className={styles.cardTitle}>
