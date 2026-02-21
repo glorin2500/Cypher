@@ -51,7 +51,44 @@
     height: 33vw;
     border-radius: 50%;
     flex-shrink: 0;
-    /* no gap — circles touch, just like the reference */
+    /* floating animation — delay set inline per-bubble for stagger */
+    animation: orbFloat 6s ease-in-out infinite alternate;
+    will-change: transform;
+}
+
+@keyframes orbFloat {
+    0% {
+        transform: translateY(0px) scale(1);
+    }
+
+    50% {
+        transform: translateY(-10px) scale(1.04);
+    }
+
+    100% {
+        transform: translateY(5px) scale(0.97);
+    }
+}
+
+/* ── Bubble color variants — use CSS variables so they respect theme ── */
+.green {
+    background: var(--primary-green);
+}
+
+.surface {
+    background: var(--surface-bg);
+}
+
+.surface2 {
+    background: var(--surface-hover);
+}
+
+.white {
+    background: var(--text-primary);
+}
+
+.gray {
+    background: #b0b0b0;
 }
 
 /* Animated Cypher logo centered over the bubble grid */
@@ -429,6 +466,7 @@
     .bubble {
         width: 160px;
         height: 160px;
+        animation: orbFloat 6s ease-in-out infinite;
     }
 
     .bubbleRowBase {

@@ -44,30 +44,23 @@ const CypherLogo = () => (
 );
 
 // ─────────────────────────────────────────────────────────────────────────
-//  BUBBLE GRID — matches reference image layout exactly
+//  BUBBLE GRID — 4 rows × 5 circles, each 33vw wide (3 visible per row)
+//  Alternating rows offset by 16.5vw → exact stagger like reference image.
+//  Colors use CSS classes that map to app CSS variables.
+//  Each bubble gets a unique animationDelay for the floating animation.
 //
-//  Reference has ~3 circles per row, meaning each circle ≈ 33vw wide.
-//  Alternating rows are offset by half a circle (16.5vw) to create stagger.
-//  Colors mapped to Cypher theme:
-//    Yellow-green  →  #34C759  (--primary-green)
-//    Dark gray     →  #141414  (--surface-bg)
-//    Darker gray   →  #1a1a1a  (--surface-hover)
-//    White         →  #ffffff  (--text-primary)
-//    Light gray    →  #b0b0b0  (neutral accent, like the blue-gray in ref)
+//  CSS class → CSS variable mapping:
+//    "green"    → var(--primary-green)   #34C759
+//    "surface"  → var(--surface-bg)      #141414
+//    "surface2" → var(--surface-hover)   #1A1A1A
+//    "white"    → var(--text-primary)    #fff
+//    "gray"     → #b0b0b0 (neutral)
 // ─────────────────────────────────────────────────────────────────────────
-//
-//  Row layout (R = odd/base, O = even/offset):
-//
-//  R1: [dark,  dark,  GREEN, GREEN, dark ] ← 3.5 visible
-//  O2: [GREEN, dark,  WHITE, dark,  GREEN] ← 3.5 visible (shifted 16.5vw)
-//  R3: [gray,  dark,  GREEN, dark,  gray ] ← 3.5 visible
-//  O4: [dark,  GREEN, dark,  dark,  dark ] ← partial (fades out)
-//
 const ROWS: string[][] = [
-    ["#141414", "#1a1a1a", "#34C759", "#34C759", "#141414"],
-    ["#34C759", "#141414", "#ffffff", "#141414", "#34C759"],
-    ["#b0b0b0", "#141414", "#34C759", "#141414", "#b0b0b0"],
-    ["#141414", "#34C759", "#141414", "#1a1a1a", "#141414"],
+    ["surface", "surface2", "green", "green", "surface"],
+    ["green", "surface", "white", "surface", "green"],
+    ["gray", "surface", "green", "surface2", "gray"],
+    ["surface", "green", "surface", "surface2", "surface"],
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -130,8 +123,12 @@ export default function AuthPage() {
                         key={ri}
                         className={`${styles.bubbleRow} ${ri % 2 === 0 ? styles.bubbleRowBase : styles.bubbleRowOffset}`}
                     >
-                        {row.map((color, ci) => (
-                            <div key={ci} className={styles.bubble} style={{ background: color }} />
+                        {row.map((colorClass, ci) => (
+                            <div
+                                key={ci}
+                                className={`${styles.bubble} ${styles[colorClass]}`}
+                                style={{ animationDelay: `${(ri * 5 + ci) * 0.18}s` }}
+                            />
                         ))}
                     </div>
                 ))}
