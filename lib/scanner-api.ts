@@ -123,33 +123,16 @@ export async function analyzeQRPayload(
         const data = await response.json();
         return data as AnalysisResult;
     } catch (error: any) {
-        console.warn('⚠️ Backend unavailable, using local analysis:', error.message);
+        console.warn('⚠️ Backend unavailable, using local ML analysis:', error.message);
 
-        // Enhanced Fallback: Deterministic analysis based on features
-        const riskScore = Math.round(
-            (features.amount_risk * 30) +
-            (features.payee_risk * 40) +
-            (features.frequency_risk * 15) +
-            (features.timing_risk * 10) +
-            (features.device_risk * 5)
-        );
-
-        const reasons: string[] = [];
-
-        if (features.payee_risk > 0.6) reasons.push('Unverified payment provider detected');
-        if (features.amount_risk > 0.7) reasons.push('Unusual transaction amount');
-        if (features.timing_risk > 0.5) reasons.push('Transaction at unusual hours');
-        if (features.frequency_risk > 0.6) reasons.push('High transaction frequency');
-        if (features.device_risk > 0.5) reasons.push('Device security concerns');
-
-        if (reasons.length === 0) {
-            reasons.push('Transaction pattern appears normal');
-        }
+        // ML Fallback: Run ONNX model in browser
+        const { runOfflineScoring } = await import('./offline-model');
+        const offlineResult = await runOfflineScoring(features.payee_id || '');
 
         return {
-            risk_label: riskScore >= 60 ? 'danger' : riskScore >= 30 ? 'warning' : 'safe',
-            risk_score: riskScore,
-            reasons,
+            risk_label: offlineResult.score >= 70 ? 'danger' : offlineResult.score >= 30 ? 'warning' : 'safe',
+            risk_score: offlineResult.score,
+            reasons: offlineResult.reasons,
             timestamp: new Date().toISOString()
         };
     }

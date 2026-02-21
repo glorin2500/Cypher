@@ -8,3 +8,5 @@ pandas
 slowapi
 sqlalchemy
 psycopg2-binary
+skl2onnx
+onnxruntime
