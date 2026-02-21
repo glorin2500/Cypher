@@ -5,65 +5,56 @@ import { useState, useEffect } from "react";
 import styles from "./auth.module.css";
 import { setUserName } from "@/lib/user-store";
 
-// ── Animated Logo — exact Cypher hex+gem with draw-on + glow pulse ─────────
+// ─────────────────────────────────────────────────────────────
+// Animated Cypher Logo — hex draws on, gem pops in, glow pulses
+// ─────────────────────────────────────────────────────────────
 const CypherLogo = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={styles.logo}>
-        <defs>
-            <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="0.8" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
-        </defs>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+        className={styles.logo}>
         <style>{`
             @keyframes drawHex {
-                to { stroke-dashoffset: 0; }
+                from { stroke-dashoffset: 60; }
+                to   { stroke-dashoffset: 0;  }
             }
             @keyframes revealGem {
-                to { transform: scale(1) rotate(0deg); opacity: 1; }
+                from { transform: scale(0) rotate(-90deg); opacity: 0; }
+                to   { transform: scale(1) rotate(0deg);   opacity: 1; }
             }
             @keyframes glowPulse {
-                0%, 100% { filter: drop-shadow(0 0 4px rgba(255,255,255,0.4)); }
-                50%       { filter: drop-shadow(0 0 14px rgba(255,255,255,0.85)); }
+                0%,100% { filter: drop-shadow(0 0 4px rgba(255,255,255,0.35)); }
+                50%     { filter: drop-shadow(0 0 14px rgba(255,255,255,0.8)); }
             }
             .hexPath {
                 stroke: var(--text-primary);
                 stroke-dasharray: 60;
                 stroke-dashoffset: 60;
-                animation: drawHex 1.5s cubic-bezier(0.22,1,0.36,1) forwards 0.2s;
+                animation: drawHex 1.5s cubic-bezier(0.22,1,0.36,1) forwards 0.3s;
             }
             .gemPath {
-                transform-origin: center;
-                transform: scale(0) rotate(-90deg);
-                opacity: 0;
+                transform-origin: 12px 12px;
                 fill: var(--text-primary);
                 animation:
-                    revealGem 1s cubic-bezier(0.34,1.56,0.64,1) forwards 0.8s,
-                    glowPulse 3s ease-in-out infinite 2s;
+                    revealGem 0.9s cubic-bezier(0.34,1.56,0.64,1) forwards 0.95s,
+                    glowPulse 3s ease-in-out infinite 2.2s;
+                opacity: 0;
             }
         `}</style>
         <path className="hexPath" d="M20 7L12 2.5L4 7V17L12 21.5L20 17" fill="none" />
-        <path className="gemPath" d="M12 9L15 12L12 15L9 12L12 9Z" stroke="none" />
+        <path className="gemPath" d="M12 9L15 12L12 15L9 12Z" stroke="none" />
     </svg>
 );
 
-// ── Orbs — dashboard palette: dark surfaces + white accents, NO yellow-green ─
-// Colors: --bg-primary (#000), --surface-bg (#141414), --surface-hover (#1A1A1A),
-//          rgba(white, 0.08) ghost, white (text-primary)
-const ORBS = [
-    { cx: 70, cy: 4, r: 13, color: "#141414", delay: 0 },
-    { cx: 18, cy: 3, r: 11, color: "#1A1A1A", delay: 0.5 },
-    { cx: 46, cy: 1, r: 9, color: "rgba(255,255,255,0.07)", delay: 0.9 },
-    { cx: 87, cy: 19, r: 10, color: "#141414", delay: 0.2 },
-    { cx: 6, cy: 18, r: 14, color: "#1A1A1A", delay: 1.1 },
-    { cx: 34, cy: 16, r: 8, color: "rgba(255,255,255,0.9)", delay: 0.6 }, // white orb
-    { cx: 60, cy: 22, r: 12, color: "#141414", delay: 0.3 },
-    { cx: 93, cy: 8, r: 7, color: "rgba(255,255,255,0.06)", delay: 1.0 },
-    { cx: 13, cy: 36, r: 9, color: "#1A1A1A", delay: 0.4 },
-    { cx: 55, cy: 39, r: 11, color: "#141414", delay: 1.3 },
-    { cx: 82, cy: 37, r: 8, color: "rgba(255,255,255,0.08)", delay: 0.8 },
-    { cx: 29, cy: 43, r: 13, color: "#1A1A1A", delay: 0.1 },
-    { cx: 76, cy: 52, r: 7, color: "#141414", delay: 0.7 },
-    { cx: 42, cy: 50, r: 9, color: "rgba(255,255,255,0.05)", delay: 1.5 },
+// ─────────────────────────────────────────────────────────────
+// Bubble grid — 4 rows × 5 circles
+// Even rows offset right by half a bubble to create stagger
+// Colors: only dashboard palette (surface + white)
+// ─────────────────────────────────────────────────────────────
+const ROWS: string[][] = [
+    ["#1a1a1a", "#141414", "#1e1e1e", "#141414", "#1a1a1a"],
+    ["#141414", "#0f0f0f", "#ffffff", "#1a1a1a", "#141414"],
+    ["#e8e8e8", "#141414", "#1a1a1a", "#0f0f0f", "#1e1e1e"],
+    ["#141414", "#1a1a1a", "#141414", "#1e1e1e", "#141414"],
 ];
 
 const flashcards = [
@@ -85,7 +76,9 @@ const flashcards = [
 ];
 
 const ArrowLeft = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 18, height: 18 }}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+        style={{ width: 18, height: 18 }}>
         <path d="M19 12H5M12 19l-7-7 7-7" />
     </svg>
 );
@@ -105,37 +98,39 @@ export default function AuthPage() {
         return () => clearInterval(id);
     }, [authMode]);
 
-    const goAuth = (tab: "signin" | "signup") => { setAuthMode("auth"); setAuthTab(tab); };
-    const handleContinue = () => { if (name.trim()) setUserName(name); router.push("/dashboard"); };
+    const handleContinue = () => {
+        if (name.trim()) setUserName(name);
+        router.push("/dashboard");
+    };
 
     const f = flashcards[card];
 
-    // ── INTRO ──────────────────────────────────────────────────────────────
+    // ── INTRO ────────────────────────────────────────────────
     if (authMode === "intro") return (
         <div className={styles.page}>
-            {/* ── Orb field fills top ~55% ── */}
-            <div className={styles.orbField}>
-                {ORBS.map((o, i) => (
-                    <div key={i} className={styles.orb} style={{
-                        left: `${o.cx}%`,
-                        top: `${o.cy}%`,
-                        width: `clamp(48px, ${o.r * 2.2}vw, ${o.r * 5.5}px)`,
-                        height: `clamp(48px, ${o.r * 2.2}vw, ${o.r * 5.5}px)`,
-                        background: o.color,
-                        animationDelay: `${o.delay}s`,
-                    }} />
+
+            {/* BUBBLE FIELD */}
+            <div className={styles.bubbleField}>
+                {ROWS.map((row, ri) => (
+                    <div key={ri} className={`${styles.bubbleRow} ${ri % 2 === 1 ? styles.bubbleRowOffset : ""}`}>
+                        {row.map((color, ci) => (
+                            <div key={ci} className={styles.bubble} style={{ background: color }} />
+                        ))}
+                    </div>
                 ))}
-                {/* Logo centered in the orb area */}
-                <div className={styles.orbLogo}>
+
+                {/* LOGO centered over bubbles */}
+                <div className={styles.logoOverlay}>
                     <CypherLogo />
-                    <span className={styles.orbLogoText}>CYPHER</span>
+                    <span className={styles.logoLabel}>CYPHER</span>
                 </div>
-                {/* Fade to bg */}
-                <div className={styles.orbFade} />
+
+                {/* fade to bg color at bottom */}
+                <div className={styles.bubbleFade} />
             </div>
 
-            {/* ── Flashcard + CTA ── */}
-            <div className={styles.introContent}>
+            {/* FLASHCARD + CTA */}
+            <div className={styles.bottom}>
                 <div className={styles.card} key={card}>
                     <span className={styles.cardLabel}>{f.label}</span>
                     <h1 className={styles.cardTitle}>
@@ -146,43 +141,60 @@ export default function AuthPage() {
 
                 <div className={styles.dots}>
                     {flashcards.map((_, i) => (
-                        <button key={i} className={`${styles.dot} ${i === card ? styles.dotActive : ""}`} onClick={() => setCard(i)} />
+                        <button key={i}
+                            className={`${styles.dot} ${i === card ? styles.dotActive : ""}`}
+                            onClick={() => setCard(i)} />
                     ))}
                 </div>
 
-                <button className={styles.btnPrimary} onClick={() => goAuth("signup")}>
+                <button className={styles.btnPrimary}
+                    onClick={() => { setAuthMode("auth"); setAuthTab("signup"); }}>
                     Get Started
                 </button>
+
                 <p className={styles.footerHint}>
-                    Already have an account? <span onClick={() => goAuth("signin")}>Log In</span>
+                    Already have an account?{" "}
+                    <span onClick={() => { setAuthMode("auth"); setAuthTab("signin"); }}>Log In</span>
                 </p>
             </div>
         </div>
     );
 
-    // ── AUTH ───────────────────────────────────────────────────────────────
+    // ── AUTH ─────────────────────────────────────────────────
     return (
         <div className={styles.page}>
-            <div className={styles.authHeader}>
+            <div className={styles.authInner}>
+
                 <button className={styles.backBtn} onClick={() => setAuthMode("intro")}>
                     <ArrowLeft /> Back
                 </button>
-                <p className={styles.authEyebrow}>{authTab === "signup" ? "New Account" : "Welcome Back"}</p>
-                <h2 className={styles.authTitle}>{authTab === "signup" ? "Create Account" : "Sign In"}</h2>
-            </div>
 
-            <div className={styles.authBody}>
+                <div className={styles.authHead}>
+                    <p className={styles.authEyebrow}>
+                        {authTab === "signup" ? "New Account" : "Welcome Back"}
+                    </p>
+                    <h2 className={styles.authTitle}>
+                        {authTab === "signup" ? "Create Account" : "Sign In"}
+                    </h2>
+                </div>
+
                 <div className={styles.toggle}>
-                    <button className={`${styles.toggleBtn} ${authTab === "signin" ? styles.toggleActive : ""}`} onClick={() => setAuthTab("signin")}>Sign In</button>
-                    <button className={`${styles.toggleBtn} ${authTab === "signup" ? styles.toggleActive : ""}`} onClick={() => setAuthTab("signup")}>Sign Up</button>
+                    <button className={`${styles.toggleBtn} ${authTab === "signin" ? styles.toggleActive : ""}`}
+                        onClick={() => setAuthTab("signin")}>Sign In</button>
+                    <button className={`${styles.toggleBtn} ${authTab === "signup" ? styles.toggleActive : ""}`}
+                        onClick={() => setAuthTab("signup")}>Sign Up</button>
                 </div>
 
                 <div className={styles.inputs}>
-                    <input type="email" placeholder="Email" className={styles.input} autoComplete="email" />
+                    <input type="email" placeholder="Email"
+                        className={styles.input} autoComplete="email" />
                     {authTab === "signup" && (
-                        <input type="text" placeholder="Username" className={styles.input} value={name} onChange={e => setName(e.target.value)} />
+                        <input type="text" placeholder="Username"
+                            className={styles.input}
+                            value={name} onChange={e => setName(e.target.value)} />
                     )}
-                    <input type="password" placeholder="Password" className={styles.input} autoComplete="current-password" />
+                    <input type="password" placeholder="Password"
+                        className={styles.input} autoComplete="current-password" />
                 </div>
 
                 <button className={styles.btnPrimary} onClick={handleContinue}>
@@ -212,7 +224,8 @@ export default function AuthPage() {
                 <p className={styles.switchHint}>
                     {authTab === "signup"
                         ? <><span className={styles.muted}>Already have an account? </span><span className={styles.link} onClick={() => setAuthTab("signin")}>Sign In</span></>
-                        : <><span className={styles.muted}>Don&apos;t have an account? </span><span className={styles.link} onClick={() => setAuthTab("signup")}>Sign Up</span></>}
+                        : <><span className={styles.muted}>Don&apos;t have an account? </span><span className={styles.link} onClick={() => setAuthTab("signup")}>Sign Up</span></>
+                    }
                 </p>
             </div>
         </div>

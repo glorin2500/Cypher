@@ -1,159 +1,119 @@
-/* ===================================
-   CYPHER — AUTH / LANDING PAGE
-   Dashboard design tokens throughout:
-   font: --font-family (Urbanist)
-   bg: --bg-primary (#000)
-   surface: --surface-bg (#141414)
-   border: --border-color (rgba white 10%)
-   btn: --text-primary on --bg-primary
-   =================================== */
+/* ===================================================
+   CYPHER — LANDING + AUTH PAGE
+   All tokens from globals.css / dashboard.module.css
+   =================================================== */
 
-/* ── Base page shell ── */
+/* ── Root ── */
 .page {
-    position: relative;
     min-height: 100vh;
     min-height: 100dvh;
     background: var(--bg-primary);
     font-family: var(--font-family);
     color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
-    transition: background-color 0.3s ease;
 }
 
-/* ── Logo SVG sizing ── */
-.logo {
-    width: 52px;
-    height: 52px;
+/* ================================================================
+   BUBBLE FIELD
+   4 rows of 5 circles each (25vw per circle).
+   Even rows are offset 12.5vw to create the stagger effect.
+   The field is capped at 50% of screen height via max-height.
+   ================================================================ */
+.bubbleField {
+    position: relative;
+    width: 100%;
+    /* 4 rows × 25vw tall each = 100vw, cap at 55dvh */
+    height: min(100vw, 55dvh);
+    overflow: hidden;
+    flex-shrink: 0;
 }
 
-/* ── Orb field (top 56% of screen) ── */
-.orbField {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 58%;
-    pointer-events: none;
-    z-index: 0;
+.bubbleRow {
+    display: flex;
+    /* negative margin so row overflows on both sides equally */
+    margin-left: -12.5vw;
+    width: calc(100% + 25vw);
+    /* enough to fit 5 circles + offset */
 }
 
-.orb {
-    position: absolute;
+/* Even rows shift right by half a bubble → stagger */
+.bubbleRowOffset {
+    margin-left: 0;
+}
+
+.bubble {
+    width: 25vw;
+    height: 25vw;
     border-radius: 50%;
-    animation: orbFloat 6s ease-in-out infinite alternate;
-    will-change: transform;
+    flex-shrink: 0;
+    /* no gap — circles touch */
 }
 
-@keyframes orbFloat {
-    0% {
-        transform: translateY(0) scale(1);
-    }
-
-    50% {
-        transform: translateY(-9px) scale(1.04);
-    }
-
-    100% {
-        transform: translateY(5px) scale(0.96);
-    }
-}
-
-/* Logo centered inside orb field */
-.orbLogo {
+/* ── Animated logo centered over the bubbles ── */
+.logoOverlay {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    inset: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 10px;
-    z-index: 2;
+    z-index: 10;
+    /* subtle backdrop so logo is readable on any bubble color */
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.45) 30%, transparent 72%);
 }
 
-.orbLogoText {
+.logo {
+    width: 56px;
+    height: 56px;
+}
+
+.logoLabel {
     font-size: 11px;
     font-weight: 800;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--text-primary);
-    opacity: 0.6;
+    opacity: 0.65;
 }
 
-/* Gradient fade at the bottom of orb area */
-.orbFade {
+/* Gradient from bubble field into black bg */
+.bubbleFade {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 55%;
+    height: 48%;
     background: linear-gradient(to bottom, transparent 0%, var(--bg-primary) 100%);
+    pointer-events: none;
 }
 
-/* ── Intro content sits at the bottom ── */
-.introContent {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 0 20px 36px;
+/* ================================================================
+   BOTTOM SECTION — Flashcard + CTA
+   ================================================================ */
+.bottom {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0;
-    z-index: 1;
-    animation: slideUpIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    padding: 8px 20px 36px;
 }
 
-@keyframes slideUpIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-
-
-/* Back button */
-.backBtn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-family);
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px 0;
-    transition: color 0.2s;
-}
-
-.backBtn:hover {
-    color: var(--text-primary);
-}
-
-
-
-/* Card — matches dashboard .listCard surface */
+/* Flashcard — matches dashboard .listCard */
 .card {
     background: var(--surface-bg);
     border: 1px solid var(--border-color);
     border-radius: 14px;
-    padding: 28px;
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
-    animation: fadeSlide 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+    gap: 8px;
+    margin-bottom: 18px;
+    animation: cardIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes fadeSlide {
+@keyframes cardIn {
     from {
         opacity: 0;
         transform: translateY(8px);
@@ -165,7 +125,7 @@
     }
 }
 
-/* Label — matches dashboard .listTitle / .balanceLabel style */
+/* Label — matches .balanceLabel */
 .cardLabel {
     font-size: 10px;
     font-weight: 700;
@@ -175,30 +135,29 @@
     opacity: 0.6;
 }
 
-/* Title — big, like dashboard balance hero text */
+/* Title — big and impactful */
 .cardTitle {
-    font-size: 38px;
+    font-size: 32px;
     font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.6px;
     color: var(--text-primary);
-    line-height: 1.08;
-    letter-spacing: -0.8px;
     margin: 0;
 }
 
-/* Body */
 .cardBody {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--text-secondary);
     line-height: 1.55;
-    margin: 4px 0 0;
+    margin: 0;
 }
 
 /* ── Dots ── */
 .dots {
     display: flex;
     gap: 7px;
-    margin-bottom: 4px;
+    margin-bottom: 20px;
 }
 
 .dot {
@@ -218,9 +177,7 @@
     background: var(--text-primary);
 }
 
-
-
-/* Primary button — exact match of dashboard .analysisProceed */
+/* ── CTA Button — matches .analysisProceed ── */
 .btnPrimary {
     width: 100%;
     padding: 18px;
@@ -231,9 +188,10 @@
     font-family: var(--font-family);
     font-size: 16px;
     font-weight: 700;
-    cursor: pointer;
     letter-spacing: 0.3px;
+    cursor: pointer;
     transition: all 0.2s;
+    margin-bottom: 16px;
 }
 
 .btnPrimary:hover {
@@ -246,34 +204,53 @@
     opacity: 0.9;
 }
 
-/* Hint text */
 .footerHint {
     text-align: center;
     font-size: 13px;
     font-weight: 500;
     color: var(--text-secondary);
+    margin: 0;
 }
 
 .footerHint span {
     color: var(--text-primary);
-    cursor: pointer;
     font-weight: 700;
+    cursor: pointer;
 }
 
-/* ===================================
+/* ================================================================
    AUTH PAGE
-   =================================== */
-
-.authPage {
+   ================================================================ */
+.authInner {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding-bottom: 32px;
-    max-height: calc(100dvh - 120px);
+    padding: 56px 20px 36px;
     overflow-y: auto;
 }
 
-.authHeader {
+.backBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-family);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 32px;
+    align-self: flex-start;
+    transition: color 0.2s;
+}
+
+.backBtn:hover {
+    color: var(--text-primary);
+}
+
+.authHead {
     margin-bottom: 28px;
 }
 
@@ -288,17 +265,17 @@
     margin: 0 0 8px;
 }
 
-/* Auth title — matches .text-heading */
+/* Title — matches .text-heading */
 .authTitle {
     font-size: 32px;
     font-weight: 700;
-    color: var(--text-primary);
     line-height: 1.2;
     letter-spacing: -0.5px;
+    color: var(--text-primary);
     margin: 0;
 }
 
-/* Toggle — matches dashboard pill style */
+/* Toggle pill — matches nav pill style */
 .toggle {
     display: flex;
     background: var(--surface-bg);
@@ -328,7 +305,7 @@
     color: var(--bg-primary);
 }
 
-/* Inputs — matches dashboard .searchInput */
+/* Inputs — matches .searchInput */
 .inputs {
     display: flex;
     flex-direction: column;
@@ -344,7 +321,6 @@
     border-radius: 12px;
     color: var(--text-primary);
     font-size: 16px;
-    /* 16px prevents iOS zoom */
     font-family: var(--font-family);
     font-weight: 500;
     outline: none;
@@ -367,10 +343,10 @@
     margin: 16px 0;
     gap: 12px;
     color: var(--text-tertiary);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
 }
 
 .divider::before,
@@ -381,11 +357,11 @@
     background: var(--border-color);
 }
 
-/* Social buttons — matches dashboard .actionButton style */
+/* Social buttons — matches .actionButton */
 .social {
     display: flex;
     gap: 8px;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .socialBtn {
@@ -407,17 +383,15 @@
 }
 
 .socialBtn:active {
-    transform: scale(0.97);
     background: var(--surface-hover);
+    transform: scale(0.97);
 }
 
-/* Switch hint */
 .switchHint {
     text-align: center;
     font-size: 13px;
     font-weight: 500;
     margin-top: auto;
-    padding-top: 8px;
 }
 
 .muted {
@@ -432,16 +406,16 @@
 
 /* ── Responsive ── */
 @media (max-height: 700px) {
-    .header {
-        padding-top: 32px;
+    .bubbleField {
+        height: min(80vw, 46dvh);
     }
 
     .cardTitle {
-        font-size: 30px;
+        font-size: 26px;
     }
 
-    .footer {
-        padding-bottom: 28px;
+    .bottom {
+        padding-bottom: 24px;
     }
 }
 
@@ -449,5 +423,18 @@
     .page {
         max-width: 480px;
         margin: 0 auto;
+    }
+
+    .bubble {
+        width: 120px;
+        height: 120px;
+    }
+
+    .bubbleRow {
+        margin-left: -60px;
+    }
+
+    .bubbleRowOffset {
+        margin-left: 0;
     }
 }
